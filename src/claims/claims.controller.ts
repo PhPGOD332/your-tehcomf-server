@@ -7,8 +7,8 @@ import {IClaim} from "../types/IClaim";
 export class ClaimsController {
     constructor(private readonly claimsService: ClaimsService) {}
 
-    @Post('addClaims')
-    async addClaim(@Body() claimDto: ClaimDto): Promise<void> {
-        await this.claimsService.addClaim(claimDto);
+    @Post('addClaim')
+    async addClaim(@Body() claimDto: ClaimDto): Promise<IClaim> {
+        return await this.claimsService.addClaim(claimDto);
     }
 }
