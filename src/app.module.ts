@@ -30,7 +30,8 @@ import {MailerModule} from "@nestjs-modules/mailer";
     }),
     DatabaseModule,
     ClaimsModule,
-    MailModule],
+    MailModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
