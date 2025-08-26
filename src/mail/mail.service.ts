@@ -10,9 +10,8 @@ export class MailService {
         private readonly configService: ConfigService
     ) {}
 
-    sendMail(claim: ClaimDto) {
-
-        const message = this.mailService.sendMail({
+    async sendMail(claim: ClaimDto) {
+        return await this.mailService.sendMail({
             from: `${this.configService.get('SMTP_USER')}`,
             to: `${this.configService.get('SMTP_USER')}`,
             subject: 'Новая заявка с сайта "Технологии комфорта"',
@@ -22,11 +21,10 @@ export class MailService {
                     ${claim.firstName ? `<p><b>Имя</b>: ${claim.firstName}</p>` : ''}
                     ${claim.mobilePhone ? `<p><b>Телефон</b>: ${claim.mobilePhone}</p>` : ''}
                     ${claim.note ? `<p><b>Пожелания</b>: ${claim.note}</p>` : ''}
+                    Тип заявки: ${claim.discussProject || claim.callDesign ? claim.callDesign ?? 'Вызов дизайнера ' + claim.discussProject ?? 'Обсудить проект' : '-'}
                     Дата: ${claim.dateCreated}
                 </div>
             `
         });
-
-        return message.then(value => value);
     }
 }
