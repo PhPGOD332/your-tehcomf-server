@@ -1,4 +1,4 @@
-import {IsBoolean, IsString} from "class-validator";
+import {IsBoolean, IsDate, IsString} from "class-validator";
 
 export class ClaimDto {
     @IsString()
@@ -7,8 +7,8 @@ export class ClaimDto {
     mobilePhone: string;
     @IsString()
     note: string;
-    @IsString()
-    dateCreated: string;
+    @IsDate()
+    date: Date;
     @IsBoolean()
     callDesign: boolean;
     @IsBoolean()
@@ -18,7 +18,7 @@ export class ClaimDto {
         this.firstName = data.firstName;
         this.mobilePhone = data.mobilePhone;
         this.note = data.note;
-        this.dateCreated = data.dateCreated;
+        this.date = data.date;
         this.callDesign = data.callDesign;
         this.discussProject = data.discussProject;
     }

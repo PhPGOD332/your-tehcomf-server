@@ -9,6 +9,19 @@ export class ClaimsController {
 
     @Post('addClaim')
     async addClaim(@Body() claimDto: ClaimDto): Promise<IClaim> {
-        return await this.claimsService.addClaim(claimDto);
+        // console.log((new Date(claimDto.date).getDay() + 1).toString().padStart(2, '0'))
+        return await this.claimsService.addClaim(
+            {
+                ...claimDto,
+                date: new Date(claimDto.date)
+            }
+        );
+        // return {
+        //     id: 'string',
+        //     firstName: 'string',
+        //     phoneNumber: 'string',
+        //     note: 'string',
+        //     date: new Date()
+        // };
     }
 }

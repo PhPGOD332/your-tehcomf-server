@@ -3,5 +3,5 @@ export interface IClaim {
     firstName: string;
     phoneNumber: string;
     note: string;
-    dateCreated: string;
+    date: Date;
 }

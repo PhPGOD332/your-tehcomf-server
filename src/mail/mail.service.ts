@@ -21,8 +21,8 @@ export class MailService {
                     ${claim.firstName ? `<p><b>Имя</b>: ${claim.firstName}</p>` : ''}
                     ${claim.mobilePhone ? `<p><b>Телефон</b>: ${claim.mobilePhone}</p>` : ''}
                     ${claim.note ? `<p><b>Пожелания</b>: ${claim.note}</p>` : ''}
-                    Тип заявки: ${claim.discussProject || claim.callDesign ? claim.callDesign ?? 'Вызов дизайнера ' + claim.discussProject ?? 'Обсудить проект' : '-'}
-                    Дата: ${claim.dateCreated}
+                    <p><b>Тип заявки:</b> ${claim.discussProject || claim.callDesign ? claim.callDesign ? 'Вызов дизайнера ' : 'Обсудить проект' : '-'}</p>
+                    <p><b>Дата:</b> ${claim.date.getDay().toString().padStart(2, '0')}.${(claim.date.getMonth() + 1).toString().padStart(2, '0')}.${claim.date.getFullYear()}</p>
                 </div>
             `
         });
