@@ -34,7 +34,7 @@ export class MailService {
                     ${claim.mobilePhone ? `<p><b>Телефон</b>: ${claim.mobilePhone}</p>` : ''}
                     ${claim.note ? `<p><b>Пожелания</b>: ${claim.note}</p>` : ''}
                     <p><b>Тип заявки:</b> ${claimTypeRow}</p>
-                    <p><b>Дата:</b> ${claim.date.getDay().toString().padStart(2, '0')}.${(claim.date.getMonth() + 1).toString().padStart(2, '0')}.${claim.date.getFullYear()}</p>
+                    <p><b>Дата:</b> ${claim.date.getDate().toString().padStart(2, '0')}.${(claim.date.getMonth() + 1).toString().padStart(2, '0')}.${claim.date.getFullYear()}</p>
                 </div>
             `
         });
