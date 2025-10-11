@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import {ClaimDto} from "../dtos/Claim.dto";
+import {ClaimDto} from "./dto/Claim.dto";
 import {MailService} from "../mail/mail.service";
 import {ConfigService} from "@nestjs/config";
-import {IClaim} from "../types/IClaim";
+import {IClaim} from "./types/IClaim";
 
 @Injectable()
 export class ClaimsService {

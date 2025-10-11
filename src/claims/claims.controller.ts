@@ -1,7 +1,7 @@
 import {Body, Controller, Post} from '@nestjs/common';
-import {ClaimDto} from "../dtos/Claim.dto";
+import {ClaimDto} from "./dto/Claim.dto";
 import {ClaimsService} from "./claims.service";
-import {IClaim} from "../types/IClaim";
+import {IClaim} from "./types/IClaim";
 
 @Controller('claims')
 export class ClaimsController {

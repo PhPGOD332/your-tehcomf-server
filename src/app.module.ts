@@ -6,6 +6,12 @@ import { DatabaseModule } from './database/database.module';
 import { ClaimsModule } from './claims/claims.module';
 import { MailModule } from './mail/mail.module';
 import {MailerModule} from "@nestjs-modules/mailer";
+import { QuestionsModule } from './questions/questions.module';
+import {TypeOrmModule} from "@nestjs/typeorm";
+import * as process from "process";
+import {isNumber} from "class-validator";
+import {Category} from "./questions/entities/Category";
+import {Question} from "./questions/entities/Question";
 
 @Module({
   imports: [
@@ -28,9 +34,19 @@ import {MailerModule} from "@nestjs-modules/mailer";
         }
       })
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.PG_HOST ?? 'localhost',
+      port: isNumber(process.env.PG_PORT) ? process.env.PG_PORT : 5432,
+      database: process.env.PG_DB,
+      username: process.env.PG_USER,
+      password: process.env.PG_PASSWORD,
+      entities: [Category, Question]
+    }),
     DatabaseModule,
     ClaimsModule,
-    MailModule
+    MailModule,
+    QuestionsModule
   ],
   controllers: [AppController],
   providers: [AppService],

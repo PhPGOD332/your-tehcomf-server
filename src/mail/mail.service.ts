@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {MailerService} from "@nestjs-modules/mailer";
-import {ClaimDto} from "../dtos/Claim.dto";
+import {ClaimDto} from "../claims/dto/Claim.dto";
 import {ConfigService} from "@nestjs/config";
 
 @Injectable()
