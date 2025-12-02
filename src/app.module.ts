@@ -12,6 +12,21 @@ import * as process from "process";
 import {isNumber} from "class-validator";
 import {Category} from "./questions/entities/Category";
 import {Question} from "./questions/entities/Question";
+import { ColorsModule } from './colors/colors.module';
+import {Color} from "./colors/entities/Color";
+import { FilterColorsModule } from './filter_colors/filter_colors.module';
+import {FilterColor} from "./filter_colors/entities/FilterColor";
+import { FilterTypesModule } from './filter_types/filter_types.module';
+import {FilterType} from "./filter_types/entites/FilterType";
+import { FilterStylesModule } from './filter_styles/filter_styles.module';
+import {FilterStyle} from "./filter_styles/entities/FilterStyle";
+import { FilterBudgetsModule } from './filter_budgets/filter_budgets.module';
+import {FilterBudget} from "./filter_budgets/entities/FilterBudget";
+import { PortfolioModule } from './portfolio/portfolio.module';
+import {Portfolio} from "./portfolio/entities/Portfolio";
+import {Image} from "./shared/entities/Image";
+import {PortfolioColorsList} from "./portfolio/entities/PortfolioColorsList";
+import {PortfolioImagesList} from "./portfolio/entities/PortfolioImagesList";
 
 @Module({
   imports: [
@@ -41,12 +56,19 @@ import {Question} from "./questions/entities/Question";
       database: process.env.PG_DB,
       username: process.env.PG_USER,
       password: process.env.PG_PASSWORD,
-      entities: [Category, Question]
+      entities: [Image, Color, Category, Question, FilterColor, FilterType, FilterStyle,
+        FilterBudget, Portfolio, PortfolioColorsList, PortfolioImagesList]
     }),
     DatabaseModule,
     ClaimsModule,
     MailModule,
-    QuestionsModule
+    QuestionsModule,
+    ColorsModule,
+    FilterColorsModule,
+    FilterTypesModule,
+    FilterStylesModule,
+    FilterBudgetsModule,
+    PortfolioModule
   ],
   controllers: [AppController],
   providers: [AppService],
