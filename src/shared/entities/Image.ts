@@ -5,10 +5,8 @@ export class Image {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({
-        name: 'file_name'
-    })
-    fileName: string;
+    @Column()
+    image: string;
 
     @Column({
         name: 'image_alt'
