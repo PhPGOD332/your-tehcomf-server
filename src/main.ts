@@ -7,9 +7,13 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.setGlobalPrefix('api');
+  console.log(join(__dirname, '../../data/images'));
 
-  app.useStaticAssets(join(__dirname, '../../data/images'));
+  app.useStaticAssets(join(__dirname, '../../data/images'), {
+    prefix: '/images/'
+  });
+
+  app.setGlobalPrefix('api');
 
   app.enableCors({
     credentials: true,
