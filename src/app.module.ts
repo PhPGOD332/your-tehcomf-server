@@ -27,10 +27,16 @@ import {Portfolio} from "./portfolio/entities/Portfolio";
 import {Image} from "./shared/entities/Image";
 import {PortfolioColorsList} from "./portfolio/entities/PortfolioColorsList";
 import {PortfolioImagesList} from "./portfolio/entities/PortfolioImagesList";
+import {join} from "path";
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../data/images'),
+      serveRoot: '/images/'
+    }),
     MailerModule.forRootAsync({
       imports: [ConfigModule.forRoot({
         isGlobal: true
