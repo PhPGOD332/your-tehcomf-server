@@ -2,8 +2,8 @@ import {Portfolio} from "../entities/Portfolio";
 import {PortfolioColorsList} from "../entities/PortfolioColorsList";
 import {Image} from "../../shared/entities/Image";
 import {FilterType} from "../../filter_types/entites/FilterType";
-import {FilterStyle} from "../../filter_styles/entities/FilterStyle";
 import {Color} from "../../colors/entities/Color";
+import {FilterLayout} from "../../filter_layouts/entities/FilterLayout";
 
 export class PortfolioDto {
     readonly id: number;
@@ -11,7 +11,8 @@ export class PortfolioDto {
     readonly title: string;
     readonly mainImage: Image;
     readonly type: FilterType;
-    readonly style: FilterStyle;
+    readonly style: string;
+    readonly layout: FilterLayout;
     readonly sizesRoom: string;
     readonly sizesFurniture: string;
     readonly housingMaterial: string;
@@ -21,6 +22,7 @@ export class PortfolioDto {
     readonly facadeColors: Color[];
     readonly tableTopColor: Color;
     readonly furnitureAccessories: string;
+    readonly price: number;
 
     constructor(portfolio: Portfolio, portfolioColorsList: PortfolioColorsList[]) {
         this.id = portfolio.id;
@@ -29,6 +31,7 @@ export class PortfolioDto {
         this.mainImage = portfolio.mainImage;
         this.type = portfolio.type;
         this.style = portfolio.style;
+        this.layout = portfolio.layout;
         this.sizesRoom = portfolio.sizesRoom;
         this.sizesFurniture = portfolio.sizesFurniture;
         this.housingMaterial = portfolio.housingMaterial;
@@ -42,5 +45,6 @@ export class PortfolioDto {
 
         this.tableTopColor = portfolio.tableTopColor;
         this.furnitureAccessories = portfolio.furnitureAccessories;
+        this.price = portfolio.price;
     }
 }

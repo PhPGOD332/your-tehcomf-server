@@ -16,7 +16,7 @@ export class PortfolioService {
 
     async getAllPortfolios(): Promise<PortfolioDto[]> {
         const portfolios = await this.portfolioRepository.find({
-            relations: ['mainImage', 'type', 'style', 'bodyColor', 'tableTopColor']
+            relations: ['mainImage', 'type', 'layout', 'bodyColor', 'tableTopColor']
         });
 
         const portfoliosDTO: PortfolioDto[] = [];

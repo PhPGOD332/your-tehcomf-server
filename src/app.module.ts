@@ -19,7 +19,6 @@ import {FilterColor} from "./filter_colors/entities/FilterColor";
 import { FilterTypesModule } from './filter_types/filter_types.module';
 import {FilterType} from "./filter_types/entites/FilterType";
 import { FilterStylesModule } from './filter_styles/filter_styles.module';
-import {FilterStyle} from "./filter_styles/entities/FilterStyle";
 import { FilterBudgetsModule } from './filter_budgets/filter_budgets.module';
 import {FilterBudget} from "./filter_budgets/entities/FilterBudget";
 import { PortfolioModule } from './portfolio/portfolio.module';
@@ -29,6 +28,8 @@ import {PortfolioColorsList} from "./portfolio/entities/PortfolioColorsList";
 import {PortfolioImagesList} from "./portfolio/entities/PortfolioImagesList";
 import {join} from "path";
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { FilterLayoutsModule } from './filter_layouts/filter_layouts.module';
+import {FilterLayout} from "./filter_layouts/entities/FilterLayout";
 
 @Module({
   imports: [
@@ -62,7 +63,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       database: process.env.PG_DB,
       username: process.env.PG_USER,
       password: process.env.PG_PASSWORD,
-      entities: [Image, Color, Category, Question, FilterColor, FilterType, FilterStyle,
+      entities: [Image, Color, Category, Question, FilterColor, FilterType, FilterLayout,
         FilterBudget, Portfolio, PortfolioColorsList, PortfolioImagesList]
     }),
     DatabaseModule,
@@ -74,7 +75,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     FilterTypesModule,
     FilterStylesModule,
     FilterBudgetsModule,
-    PortfolioModule
+    PortfolioModule,
+    FilterLayoutsModule
   ],
   controllers: [AppController],
   providers: [AppService],

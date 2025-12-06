@@ -5,6 +5,7 @@ import {Color} from "../../colors/entities/Color";
 import {PortfolioColorsList} from "./PortfolioColorsList";
 import {Image} from "../../shared/entities/Image";
 import {PortfolioImagesList} from "./PortfolioImagesList";
+import {FilterLayout} from "../../filter_layouts/entities/FilterLayout";
 
 @Entity('portfolio')
 export class Portfolio {
@@ -29,11 +30,14 @@ export class Portfolio {
     })
     type: FilterType;
 
-    @ManyToOne(() => FilterStyle, style => style.id)
+    @Column()
+    style: string;
+
+    @ManyToOne(() => FilterLayout, layout => layout.id)
     @JoinColumn({
-        name: 'style'
+        name: 'layout'
     })
-    style: FilterStyle;
+    layout: FilterLayout;
 
     @Column({
         name: 'sizes_room'
@@ -82,6 +86,9 @@ export class Portfolio {
         name: 'furniture_accessories'
     })
     furnitureAccessories: string;
+
+    @Column()
+    price: number;
 
     @OneToMany(() => PortfolioColorsList, list => list.work)
     portfolioColorsList: PortfolioColorsList;
