@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Portfolio} from "./entities/Portfolio";
 import {Repository} from "typeorm";
@@ -33,5 +33,21 @@ export class PortfolioService {
         // console.log(portfoliosDTO);
 
         return portfoliosDTO;
+    }
+
+    async getPortfolioItem(name: string): Promise<PortfolioDto | null> {
+        const portfolio = await this.portfolioRepository.findOne({
+            where: {name: name},
+            relations: ['mainImage', 'type', 'layout', 'bodyColor', 'tableTopColor']
+        });
+
+        if (!portfolio) return null;
+
+        const facadeColors = await this.portfolioColorsListRepository.find({
+            relations: ['work', 'color'],
+            where: { work: portfolio }
+        });
+
+        return new PortfolioDto(portfolio, facadeColors);
     }
 }

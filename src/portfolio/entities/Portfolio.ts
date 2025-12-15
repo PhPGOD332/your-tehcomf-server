@@ -75,7 +75,6 @@ export class Portfolio {
         name: 'facade_colors'
     })
     facadeColors: PortfolioColorsList;
-
     @ManyToOne(() => Color, color => color.id)
     @JoinColumn({
         name: 'table_top_color'

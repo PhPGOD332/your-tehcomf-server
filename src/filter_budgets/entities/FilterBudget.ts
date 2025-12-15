@@ -23,4 +23,7 @@ export class FilterBudget {
 
     @Column()
     type: 'budget';
+
+    @Column()
+    order: number;
 }

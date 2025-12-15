@@ -13,4 +13,7 @@ export class FilterColor {
 
     @Column()
     type: 'color';
+
+    @Column()
+    order: number;
 }

@@ -15,6 +15,9 @@ export class FilterLayout {
     @Column()
     type: 'layout';
 
+    @Column()
+    order: number;
+
     @OneToMany(() => Portfolio, portfolio => portfolio.style)
     portfolioLayout: Portfolio[];
 }

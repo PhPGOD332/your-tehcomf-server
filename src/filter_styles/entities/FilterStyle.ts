@@ -15,6 +15,9 @@ export class FilterStyle {
     @Column()
     type: 'style';
 
+    @Column()
+    order: number;
+
     @OneToMany(() => Portfolio, portfolio => portfolio.style)
     portfolioStyle: Portfolio[];
 }
