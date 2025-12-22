@@ -1,23 +1,23 @@
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Portfolio} from "../../portfolio/entities/Portfolio";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Portfolio } from '../../portfolio/entities/Portfolio';
 
 @Entity('nsi_filter_styles')
 export class FilterStyle {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    caption: string;
+  @Column()
+  caption: string;
 
-    @Column()
-    type: 'style';
+  @Column()
+  type: 'style';
 
-    @Column()
-    order: number;
+  @Column()
+  order: number;
 
-    @OneToMany(() => Portfolio, portfolio => portfolio.style)
-    portfolioStyle: Portfolio[];
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.style)
+  portfolioStyle: Portfolio[];
 }

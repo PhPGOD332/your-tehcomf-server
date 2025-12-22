@@ -1,18 +1,17 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {Category} from "./Category";
-
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from './Category';
 
 @Entity('questions')
 export class Question {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    question: string;
+  @Column()
+  question: string;
 
-    @Column({name: 'question_description'})
-    questionDescription: string;
+  @Column({ name: 'question_description' })
+  questionDescription: string;
 
-    @ManyToOne(() => Category, category => category.id)
-    category: Category;
+  @ManyToOne(() => Category, (category) => category.id)
+  category: Category;
 }

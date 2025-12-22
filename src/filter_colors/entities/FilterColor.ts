@@ -1,19 +1,19 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('nsi_filter_colors')
 export class FilterColor {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    caption: string;
+  @Column()
+  caption: string;
 
-    @Column()
-    type: 'color';
+  @Column()
+  type: 'color';
 
-    @Column()
-    order: number;
+  @Column()
+  order: number;
 }

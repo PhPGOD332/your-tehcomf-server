@@ -53,9 +53,6 @@ importers:
       typeorm:
         specifier: ^0.3.27
         version: 0.3.28(pg@8.16.3)(ts-node@10.9.2(@swc/core@1.15.3)(@types/node@22.19.1)(typescript@5.9.3))
-      your-tehcomf-server:
-        specifier: 'link:'
-        version: 'link:'
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0

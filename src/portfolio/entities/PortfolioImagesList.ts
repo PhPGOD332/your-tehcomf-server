@@ -1,21 +1,21 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {Portfolio} from "./Portfolio";
-import {Image} from "../../shared/entities/Image";
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Portfolio } from './Portfolio';
+import { Image } from '../../shared/entities/Image';
 
 @Entity('portfolio_images_list')
 export class PortfolioImagesList {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => Portfolio, portfolio => portfolio.id)
-    @JoinColumn({
-        name: 'work'
-    })
-    work: Portfolio;
+  @ManyToOne(() => Portfolio, (portfolio) => portfolio.id)
+  @JoinColumn({
+    name: 'work',
+  })
+  work: Portfolio;
 
-    @ManyToOne(() => Image, image => image.id)
-    @JoinColumn({
-        name: 'image'
-    })
-    image: Image;
+  @ManyToOne(() => Image, (image) => image.id)
+  @JoinColumn({
+    name: 'image',
+  })
+  image: Image;
 }
