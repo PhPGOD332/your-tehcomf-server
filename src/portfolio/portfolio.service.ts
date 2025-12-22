@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Portfolio } from './entities/Portfolio';
 import { Repository } from 'typeorm';
 import { PortfolioDto } from './dto/PortfolioDto';
-import { PortfolioColorsList } from './entities/PortfolioColorsList';
-import { PortfolioImagesList } from './entities/PortfolioImagesList';
+import {
+  Portfolio,
+  PortfolioColorsList,
+  PortfolioImagesList,
+} from './entities';
 
 @Injectable()
 export class PortfolioService {

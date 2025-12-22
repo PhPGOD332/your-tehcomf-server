@@ -1,15 +1,17 @@
-import { Portfolio } from '../entities/Portfolio';
-import { PortfolioColorsList } from '../entities/PortfolioColorsList';
-import { Image } from '../../shared/entities/Image';
-import { FilterType } from '../../filter_types/entites/FilterType';
-import { Color } from '../../colors/entities/Color';
-import { FilterLayout } from '../../filter_layouts/entities/FilterLayout';
-import { PortfolioImagesList } from '../entities/PortfolioImagesList';
+import type { Image } from '@/shared';
+import type { FilterLayout, FilterType } from '@/filters';
+import type { Color } from '@/colors';
+import type {
+  Portfolio,
+  PortfolioColorsList,
+  PortfolioImagesList,
+} from '../entities';
 
 export class PortfolioDto {
   readonly id: number;
   readonly name: string;
   readonly title: string;
+  readonly description: string;
   readonly images: Image[];
   readonly type: FilterType;
   readonly style: string;
@@ -33,6 +35,7 @@ export class PortfolioDto {
     this.id = portfolio.id;
     this.name = portfolio.name;
     this.title = portfolio.title;
+    this.description = portfolio.description;
     this.images = portfolioImagesList.map((list) => list.image);
 
     this.type = portfolio.type;

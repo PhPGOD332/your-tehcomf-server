@@ -1,25 +1,29 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ClaimDto } from './dto/Claim.dto';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { ClaimsService } from './claims.service';
-import { IClaim } from './types/IClaim';
+import { ClaimDto } from './dto/Claim.dto';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Claims')
 @Controller('claims')
 export class ClaimsController {
   constructor(private readonly claimsService: ClaimsService) {}
 
+  @ApiOperation({
+    summary: 'Создать заметку',
+    description: 'Создает новую заметку в системе и возвращает ее',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: ClaimDto,
+  })
+  @ApiBody({
+    type: ClaimDto,
+  })
   @Post('addClaim')
-  async addClaim(@Body() claimDto: ClaimDto): Promise<IClaim> {
-    // console.log((new Date(claimDto.date).getDay() + 1).toString().padStart(2, '0'))
+  async addClaim(@Body() claimDto: ClaimDto): Promise<ClaimDto> {
     return await this.claimsService.addClaim({
       ...claimDto,
       date: new Date(claimDto.date),
     });
-    // return {
-    //     id: 'string',
-    //     firstName: 'string',
-    //     phoneNumber: 'string',
-    //     note: 'string',
-    //     date: new Date()
-    // };
   }
 }

@@ -1,33 +1,34 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseModule } from './database/database.module';
-import { ClaimsModule } from './claims/claims.module';
-import { MailModule } from './mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { QuestionsModule } from './questions/questions.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as process from 'process';
 import { isNumber } from 'class-validator';
-import { Category } from './questions/entities/Category';
-import { Question } from './questions/entities/Question';
-import { ColorsModule } from './colors/colors.module';
-import { Color } from './colors/entities/Color';
-import { FilterColorsModule } from './filter_colors/filter_colors.module';
-import { FilterColor } from './filter_colors/entities/FilterColor';
-import { FilterTypesModule } from './filter_types/filter_types.module';
-import { FilterType } from './filter_types/entites/FilterType';
-import { FilterStylesModule } from './filter_styles/filter_styles.module';
-import { FilterBudgetsModule } from './filter_budgets/filter_budgets.module';
-import { FilterBudget } from './filter_budgets/entities/FilterBudget';
 import { PortfolioModule } from './portfolio/portfolio.module';
-import { Portfolio } from './portfolio/entities/Portfolio';
-import { Image } from './shared/entities/Image';
-import { PortfolioColorsList } from './portfolio/entities/PortfolioColorsList';
-import { PortfolioImagesList } from './portfolio/entities/PortfolioImagesList';
+import { Image } from '@/shared';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { FilterLayoutsModule } from './filter_layouts/filter_layouts.module';
-import { FilterLayout } from './filter_layouts/entities/FilterLayout';
+import { Color, ColorsModule } from './colors';
+import { Category, Question, QuestionsModule } from './questions';
+import {
+  FilterBudget,
+  FilterBudgetsModule,
+  FilterColor,
+  FilterColorsModule,
+  FilterLayout,
+  FilterLayoutsModule,
+  FilterStylesModule,
+  FilterType,
+  FilterTypesModule,
+} from './filters';
+import {
+  Portfolio,
+  PortfolioColorsList,
+  PortfolioImagesList,
+} from './portfolio';
+import { DatabaseModule } from './database';
+import { ClaimsModule } from './claims';
+import { MailModule } from './mail';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { FilterLayout } from './filter_layouts/entities/FilterLayout';
         PortfolioColorsList,
         PortfolioImagesList,
       ],
+      synchronize: true,
     }),
     DatabaseModule,
     ClaimsModule,

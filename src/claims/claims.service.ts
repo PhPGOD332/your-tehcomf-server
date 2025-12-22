@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ClaimDto } from './dto/Claim.dto';
-import { MailService } from '../mail/mail.service';
-import type { IClaim } from './types/IClaim';
+import type { ClaimDto } from './dto/Claim.dto';
+import { MailService } from '@/mail';
 
 @Injectable()
 export class ClaimsService {
   constructor(private readonly mailService: MailService) {}
 
-  async addClaim(claim: ClaimDto): Promise<IClaim> {
+  async addClaim(claim: ClaimDto): Promise<ClaimDto> {
     return await this.mailService.sendMail(claim);
   }
 }

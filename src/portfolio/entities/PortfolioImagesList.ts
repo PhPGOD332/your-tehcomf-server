@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Portfolio } from './Portfolio';
-import { Image } from '../../shared/entities/Image';
+import { Image } from '@/shared';
 
 @Entity('portfolio_images_list')
 export class PortfolioImagesList {

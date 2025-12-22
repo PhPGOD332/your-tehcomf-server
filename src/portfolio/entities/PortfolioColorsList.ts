@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Portfolio } from './Portfolio';
-import { Color } from '../../colors/entities/Color';
+import { Color } from '@/colors';
 
 @Entity('portfolio_colors_list')
 export class PortfolioColorsList {

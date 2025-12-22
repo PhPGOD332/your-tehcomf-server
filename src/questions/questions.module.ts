@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Category } from './entities/Category';
-import { Question } from './entities/Question';
+import { Category, Question } from './entities';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Category, Question])],
