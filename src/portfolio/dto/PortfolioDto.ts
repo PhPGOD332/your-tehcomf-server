@@ -4,12 +4,14 @@ import {Image} from "../../shared/entities/Image";
 import {FilterType} from "../../filter_types/entites/FilterType";
 import {Color} from "../../colors/entities/Color";
 import {FilterLayout} from "../../filter_layouts/entities/FilterLayout";
+import {PortfolioImagesList} from "../entities/PortfolioImagesList";
 
 export class PortfolioDto {
     readonly id: number;
     readonly name: string;
     readonly title: string;
-    readonly mainImage: Image;
+    // readonly mainImage: Image;
+    readonly images: Image[];
     readonly type: FilterType;
     readonly style: string;
     readonly layout: FilterLayout;
@@ -24,11 +26,18 @@ export class PortfolioDto {
     readonly furnitureAccessories: string;
     readonly price: number;
 
-    constructor(portfolio: Portfolio, portfolioColorsList: PortfolioColorsList[]) {
+    constructor(
+        portfolio: Portfolio,
+        portfolioColorsList: PortfolioColorsList[],
+        portfolioImagesList: PortfolioImagesList[]
+    ) {
         this.id = portfolio.id;
         this.name = portfolio.name;
         this.title = portfolio.title;
-        this.mainImage = portfolio.mainImage;
+        // this.mainImage = portfolio.mainImage;
+
+        this.images = portfolioImagesList.map(list => list.image);
+
         this.type = portfolio.type;
         this.style = portfolio.style;
         this.layout = portfolio.layout;

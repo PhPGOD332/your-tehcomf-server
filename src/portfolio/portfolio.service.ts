@@ -4,6 +4,7 @@ import {Portfolio} from "./entities/Portfolio";
 import {Repository} from "typeorm";
 import {PortfolioDto} from "./dto/PortfolioDto";
 import {PortfolioColorsList} from "./entities/PortfolioColorsList";
+import {PortfolioImagesList} from "./entities/PortfolioImagesList";
 
 @Injectable()
 export class PortfolioService {
@@ -11,12 +12,14 @@ export class PortfolioService {
         @InjectRepository(Portfolio)
         private readonly portfolioRepository: Repository<Portfolio>,
         @InjectRepository(PortfolioColorsList)
-        private readonly portfolioColorsListRepository: Repository<PortfolioColorsList>
+        private readonly portfolioColorsListRepository: Repository<PortfolioColorsList>,
+        @InjectRepository(PortfolioImagesList)
+        private readonly portfolioImagesListRepository: Repository<PortfolioImagesList>
     ) {}
 
     async getAllPortfolios(): Promise<PortfolioDto[]> {
         const portfolios = await this.portfolioRepository.find({
-            relations: ['mainImage', 'type', 'layout', 'bodyColor', 'tableTopColor']
+            relations: ['type', 'layout', 'bodyColor', 'tableTopColor']
         });
 
         const portfoliosDTO: PortfolioDto[] = [];
@@ -27,10 +30,14 @@ export class PortfolioService {
                 where: { work: portfolio }
             });
 
-            portfoliosDTO.push(new PortfolioDto(portfolio, facadeColors));
-        }
+            const imagesList = await this.portfolioImagesListRepository.find({
+                relations: ['work', 'image'],
+                where: { work: portfolio }
+            })
 
-        // console.log(portfoliosDTO);
+
+            portfoliosDTO.push(new PortfolioDto(portfolio, facadeColors, imagesList));
+        }
 
         return portfoliosDTO;
     }
@@ -38,7 +45,7 @@ export class PortfolioService {
     async getPortfolioItem(name: string): Promise<PortfolioDto | null> {
         const portfolio = await this.portfolioRepository.findOne({
             where: {name: name},
-            relations: ['mainImage', 'type', 'layout', 'bodyColor', 'tableTopColor']
+            relations: ['type', 'layout', 'bodyColor', 'tableTopColor']
         });
 
         if (!portfolio) return null;
@@ -48,6 +55,11 @@ export class PortfolioService {
             where: { work: portfolio }
         });
 
-        return new PortfolioDto(portfolio, facadeColors);
+        const imagesList = await this.portfolioImagesListRepository.find({
+            relations: ['work', 'image'],
+            where: { work: portfolio }
+        })
+
+        return new PortfolioDto(portfolio, facadeColors, imagesList);
     }
 }

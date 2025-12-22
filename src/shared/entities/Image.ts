@@ -5,8 +5,10 @@ export class Image {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    image: string;
+    @Column({
+        name: 'image'
+    })
+    src: string;
 
     @Column({
         name: 'image_alt'
@@ -18,4 +20,7 @@ export class Image {
 
     @Column()
     height: number;
+
+    @Column()
+    order: number;
 }

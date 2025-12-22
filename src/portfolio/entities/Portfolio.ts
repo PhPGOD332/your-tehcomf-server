@@ -1,6 +1,5 @@
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {FilterType} from "../../filter_types/entites/FilterType";
-import {FilterStyle} from "../../filter_styles/entities/FilterStyle";
 import {Color} from "../../colors/entities/Color";
 import {PortfolioColorsList} from "./PortfolioColorsList";
 import {Image} from "../../shared/entities/Image";
@@ -18,11 +17,11 @@ export class Portfolio {
     @Column()
     title: string;
 
-    @ManyToOne(() => Image, image => image.id)
-    @JoinColumn({
-        name: 'main_image'
-    })
-    mainImage: Image;
+    // @ManyToOne(() => Image, image => image.id)
+    // @JoinColumn({
+    //     name: 'main_image'
+    // })
+    // mainImage: Image;
 
     @ManyToOne(() => FilterType, type => type.id)
     @JoinColumn({
@@ -70,11 +69,6 @@ export class Portfolio {
     })
     bodyColor: Color;
 
-    @ManyToOne(() => PortfolioColorsList, list => list.id)
-    @JoinColumn({
-        name: 'facade_colors'
-    })
-    facadeColors: PortfolioColorsList;
     @ManyToOne(() => Color, color => color.id)
     @JoinColumn({
         name: 'table_top_color'

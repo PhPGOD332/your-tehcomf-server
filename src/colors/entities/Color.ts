@@ -13,6 +13,11 @@ export class Color {
     caption: string;
 
     @Column({
+        name: 'caption_for_page'
+    })
+    captionForPage: string;
+
+    @Column({
         name: 'hex_code'
     })
     hexCode: string;
