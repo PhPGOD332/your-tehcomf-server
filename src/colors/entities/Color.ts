@@ -18,15 +18,15 @@ export class Color {
 
   @ApiProperty()
   @Column({
-    name: 'caption_for_page',
-  })
-  captionForPage: string;
-
-  @ApiProperty()
-  @Column({
     name: 'hex_code',
   })
   hexCode: string;
+
+  @ApiProperty()
+  @Column({
+    name: 'caption_code',
+  })
+  captionCode: string;
 
   @ApiProperty()
   @OneToMany(() => Portfolio, (portfolio) => portfolio.bodyColor)

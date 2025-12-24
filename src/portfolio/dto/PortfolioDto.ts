@@ -1,5 +1,5 @@
 import type { Image } from '@/shared';
-import type { FilterLayout, FilterType } from '@/filters';
+import type { FilterLayout, FilterStyle, FilterType } from '@/filters';
 import type { Color } from '@/colors';
 import type {
   Portfolio,
@@ -14,7 +14,7 @@ export class PortfolioDto {
   readonly description: string;
   readonly images: Image[];
   readonly type: FilterType;
-  readonly style: string;
+  readonly style: FilterStyle;
   readonly layout: FilterLayout;
   readonly sizesRoom: string;
   readonly sizesFurniture: string;

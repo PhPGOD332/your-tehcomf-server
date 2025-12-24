@@ -1,5 +1,5 @@
 import { Color } from '@/colors';
-import { FilterLayout, FilterType } from '@/filters';
+import { FilterLayout, FilterStyle, FilterType } from '@/filters';
 import {
   Column,
   Entity,
@@ -44,8 +44,11 @@ export class Portfolio {
   type: FilterType;
 
   @ApiProperty()
-  @Column()
-  style: string;
+  @ManyToOne(() => FilterStyle, (style) => style.id)
+  @JoinColumn({
+    name: 'style',
+  })
+  style: FilterStyle;
 
   @ApiProperty()
   @ManyToOne(() => FilterLayout, (layout) => layout.id)

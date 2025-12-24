@@ -7,6 +7,7 @@ import {
   PortfolioColorsList,
   PortfolioImagesList,
 } from './entities';
+import { TFilterType } from '@/shared';
 
 @Injectable()
 export class PortfolioService {
@@ -19,8 +20,45 @@ export class PortfolioService {
     private readonly portfolioImagesListRepository: Repository<PortfolioImagesList>,
   ) {}
 
-  async getAllPortfolios(): Promise<PortfolioDto[]> {
+  async getAllPortfolios(
+    filterProperty?: TFilterType,
+    filterValue?: string,
+  ): Promise<PortfolioDto[]> {
+    // Если есть фильтрация
+    if (filterProperty) {
+      const portfolios = await this.portfolioRepository.find({
+        where: {
+          [filterProperty]: {
+            name: filterValue,
+          },
+        },
+        relations: ['type', 'layout', 'bodyColor', 'tableTopColor', 'style'],
+      });
+
+      const portfoliosDTO: PortfolioDto[] = [];
+
+      for (const portfolio of portfolios) {
+        const facadeColors = await this.portfolioColorsListRepository.find({
+          relations: ['work', 'color'],
+          where: { work: portfolio },
+        });
+
+        const imagesList = await this.portfolioImagesListRepository.find({
+          relations: ['work', 'image'],
+          where: { work: portfolio },
+        });
+
+        portfoliosDTO.push(
+          new PortfolioDto(portfolio, facadeColors, imagesList),
+        );
+      }
+
+      return portfoliosDTO;
+    }
+
+    // Если нет фильтрации
     const portfolios = await this.portfolioRepository.find({
+      // where:
       relations: ['type', 'layout', 'bodyColor', 'tableTopColor'],
     });
 
