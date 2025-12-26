@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Color } from './entities/Color';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Color } from '@prisma/client';
+import { PrismaService } from '@/database';
 
 @Injectable()
 export class ColorsService {
-  constructor(
-    @InjectRepository(Color)
-    private colorRepository: Repository<Color>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getColors(): Promise<Color[]> {
-    return await this.colorRepository.find();
+    return this.prisma.color.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+    });
   }
 }

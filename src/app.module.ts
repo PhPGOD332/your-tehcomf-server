@@ -1,35 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import * as process from 'process';
-import { isNumber } from 'class-validator';
-import { PortfolioModule } from './portfolio/portfolio.module';
-import { Image } from '@/shared';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { Color, ColorsModule } from './colors';
-import { Category, Question, QuestionsModule } from './questions';
+import { PortfolioModule } from './portfolio/portfolio.module';
 import {
-  FilterBudget,
   FilterBudgetsModule,
-  FilterColor,
   FilterColorsModule,
-  FilterLayout,
   FilterLayoutsModule,
-  FilterStyle,
   FilterStylesModule,
-  FilterType,
   FilterTypesModule,
 } from './filters';
-import {
-  Portfolio,
-  PortfolioColorsList,
-  PortfolioImagesList,
-} from './portfolio';
 import { DatabaseModule } from './database';
 import { ClaimsModule } from './claims';
 import { MailModule } from './mail';
+import { ColorsModule } from './colors';
+import { QuestionsModule } from './questions';
 
 @Module({
   imports: [
@@ -57,29 +43,6 @@ import { MailModule } from './mail';
           logger: true,
         },
       }),
-    }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.PG_HOST ?? 'localhost',
-      port: isNumber(process.env.PG_PORT) ? process.env.PG_PORT : 5432,
-      database: process.env.PG_DB,
-      username: process.env.PG_USER,
-      password: process.env.PG_PASSWORD,
-      entities: [
-        Image,
-        Color,
-        Category,
-        Question,
-        FilterColor,
-        FilterType,
-        FilterLayout,
-        FilterStyle,
-        FilterBudget,
-        Portfolio,
-        PortfolioColorsList,
-        PortfolioImagesList,
-      ],
-      synchronize: true,
     }),
     DatabaseModule,
     ClaimsModule,

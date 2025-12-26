@@ -1,18 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Question } from './Question';
 import { ApiProperty } from '@nestjs/swagger';
+import { QuestionEntity } from './Question';
 
-@Entity('nsi_questions_categories')
-export class Category {
+export class CategoryEntity {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
   id: number;
 
   @ApiProperty()
-  @Column()
   category: string;
 
-  @ApiProperty()
-  @OneToMany(() => Question, (question) => question.category)
-  questions: Question[];
+  @ApiProperty({ type: () => [QuestionEntity], required: false })
+  questions?: QuestionEntity[];
 }

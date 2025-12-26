@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { FilterBudget } from './entities/FilterBudget';
+import { FilterBudget } from '@prisma/client';
+import { PrismaService } from '@/database';
 
 @Injectable()
 export class FilterBudgetsService {
-  constructor(
-    @InjectRepository(FilterBudget)
-    private filterBudgetRepository: Repository<FilterBudget>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getFilterBudgets(): Promise<FilterBudget[]> {
-    return await this.filterBudgetRepository.find();
+    return this.prisma.filterBudget.findMany({
+      orderBy: {
+        order: 'asc',
+      },
+    });
   }
 }

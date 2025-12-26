@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { FilterLayout } from './entities/FilterLayout';
+import { FilterLayout } from '@prisma/client';
+import { PrismaService } from '@/database';
 
 @Injectable()
 export class FilterLayoutsService {
-  constructor(
-    @InjectRepository(FilterLayout)
-    private filterLayoutRepository: Repository<FilterLayout>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getFilterLayouts(): Promise<FilterLayout[]> {
-    return await this.filterLayoutRepository.find();
+    return this.prisma.filterLayout.findMany({
+      orderBy: {
+        order: 'asc',
+      },
+    });
   }
 }

@@ -1,11 +1,23 @@
-import type { Image } from '@/shared';
-import type { FilterLayout, FilterStyle, FilterType } from '@/filters';
-import type { Color } from '@/colors';
 import type {
+  Color,
+  FilterLayout,
+  FilterStyle,
+  FilterType,
+  Image,
   Portfolio,
   PortfolioColorsList,
   PortfolioImagesList,
-} from '../entities';
+} from '@prisma/client';
+
+export type PortfolioWithRelations = Portfolio & {
+  type: FilterType | null;
+  style: FilterStyle | null;
+  layout: FilterLayout | null;
+  bodyColor: Color | null;
+  tableTopColor: Color | null;
+  colorsList: (PortfolioColorsList & { color: Color | null })[];
+  imagesList: (PortfolioImagesList & { image: Image | null })[];
+};
 
 export class PortfolioDto {
   readonly id: number;
@@ -13,30 +25,28 @@ export class PortfolioDto {
   readonly title: string;
   readonly description: string;
   readonly images: Image[];
-  readonly type: FilterType;
-  readonly style: FilterStyle;
-  readonly layout: FilterLayout;
+  readonly type: FilterType | null;
+  readonly style: FilterStyle | null;
+  readonly layout: FilterLayout | null;
   readonly sizesRoom: string;
   readonly sizesFurniture: string;
   readonly housingMaterial: string;
   readonly facadeMaterial: string;
   readonly tableTopMaterial: string;
-  readonly bodyColor: Color;
+  readonly bodyColor: Color | null;
   readonly facadeColors: Color[];
-  readonly tableTopColor: Color;
+  readonly tableTopColor: Color | null;
   readonly furnitureAccessories: string;
   readonly price: number;
 
-  constructor(
-    portfolio: Portfolio,
-    portfolioColorsList: PortfolioColorsList[],
-    portfolioImagesList: PortfolioImagesList[],
-  ) {
+  constructor(portfolio: PortfolioWithRelations) {
     this.id = portfolio.id;
     this.name = portfolio.name;
     this.title = portfolio.title;
     this.description = portfolio.description;
-    this.images = portfolioImagesList.map((list) => list.image);
+    this.images = (portfolio.imagesList ?? [])
+      .map((list) => list.image)
+      .filter((image): image is Image => Boolean(image));
 
     this.type = portfolio.type;
     this.style = portfolio.style;
@@ -48,9 +58,9 @@ export class PortfolioDto {
     this.tableTopMaterial = portfolio.tableTopMaterial;
     this.bodyColor = portfolio.bodyColor;
 
-    this.facadeColors = portfolioColorsList.map((list) => {
-      return list.color;
-    });
+    this.facadeColors = (portfolio.colorsList ?? [])
+      .map((list) => list.color)
+      .filter((color): color is Color => Boolean(color));
 
     this.tableTopColor = portfolio.tableTopColor;
     this.furnitureAccessories = portfolio.furnitureAccessories;

@@ -1,26 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('nsi_images')
 export class Image {
-  @PrimaryGeneratedColumn()
+  @ApiProperty()
   id: number;
 
-  @Column({
-    name: 'image',
-  })
+  @ApiProperty({ name: 'image' })
   src: string;
 
-  @Column({
-    name: 'image_alt',
-  })
+  @ApiProperty({ name: 'image_alt' })
   imageAlt: string;
 
-  @Column()
+  @ApiProperty()
   width: number;
 
-  @Column()
+  @ApiProperty()
   height: number;
 
-  @Column()
+  @ApiProperty()
   order: number;
 }

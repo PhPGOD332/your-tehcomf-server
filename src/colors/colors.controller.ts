@@ -1,7 +1,8 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
 import { ColorsService } from './colors.service';
-import { Color } from './entities/Color';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Color } from '@prisma/client';
+import { ColorEntity } from './entities/Color';
 
 @Controller('colors')
 export class ColorsController {
@@ -11,10 +12,10 @@ export class ColorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Список всех цветов',
-    type: [Color],
+    type: [ColorEntity],
   })
   @Get('')
   async getColors(): Promise<Color[]> {
-    return await this.colorsService.getColors();
+    return this.colorsService.getColors();
   }
 }

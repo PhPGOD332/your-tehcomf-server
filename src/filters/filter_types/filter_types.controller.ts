@@ -1,13 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
-import { FilterTypesService } from './filter_types.service';
-import { FilterType } from './entites/FilterType';
+import {
+  FilterTypesService,
+  FilterTypeWithOrder,
+} from './filter_types.service';
 
 @Controller('filter-types')
 export class FilterTypesController {
   constructor(private readonly filterTypesService: FilterTypesService) {}
 
   @Get('')
-  async getFilterTypes(): Promise<FilterType[]> {
-    return await this.filterTypesService.getFilterTypes();
+  async getFilterTypes(): Promise<FilterTypeWithOrder[]> {
+    return this.filterTypesService.getFilterTypes();
   }
 }

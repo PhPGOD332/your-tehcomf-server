@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id       Int                   @id(map: "images_pk") @default(autoincrement())
+  src      String                @map("image") @db.VarChar
+  imageAlt String                @map("image_alt") @db.VarChar
+  width    Int
+  height   Int
+  order    Int                   @map("order")
+  images   PortfolioImagesList[]
+
+  @@map("nsi_images")
+}
+
+model Color {
+  id            Int                   @id(map: "nsi_colors_pk") @default(autoincrement())
+  name          String                @db.VarChar
+  caption       String                @db.VarChar
+  hexCode       String                @map("hex_code") @db.VarChar
+  captionCode   String                @map("caption_code") @db.VarChar
+  bodyWorks     Portfolio[]           @relation("BodyColor")
+  tableTopWorks Portfolio[]           @relation("TableTopColor")
+  palette       PortfolioColorsList[]
+
+  @@map("nsi_colors")
+}
+
+model FilterColor {
+  id      Int    @id(map: "nsi_filter_colors_pk") @default(autoincrement())
+  name    String @db.VarChar
+  caption String @db.VarChar
+  type    String @db.VarChar
+  order   Int
+
+  @@map("nsi_filter_colors")
+}
+
+model FilterLayout {
+  id      Int         @id(map: "nsi_filter_styles_pk") @default(autoincrement())
+  name    String      @db.VarChar
+  caption String      @db.VarChar
+  type    String      @db.VarChar
+  order   Int
+  works   Portfolio[]
+
+  @@map("nsi_filter_layouts")
+}
+
+model FilterStyle {
+  id      Int         @id @default(autoincrement())
+  name    String      @db.VarChar
+  caption String      @db.VarChar
+  type    String      @db.VarChar
+  order   Int
+  works   Portfolio[]
+
+  @@map("nsi_filter_styles")
+}
+
+model FilterBudget {
+  id       Int    @id(map: "nsi_filter_budget_pk") @default(autoincrement())
+  minValue Int    @map("min_value")
+  maxValue Int    @map("max_value")
+  caption  String @db.VarChar
+  name     String @db.VarChar
+  type     String @db.VarChar
+  order    Int
+
+  @@map("nsi_filter_budgets")
+}
+
+model FilterType {
+  id      Int         @id(map: "nsi_filter_types_pk") @default(autoincrement())
+  name    String      @db.VarChar
+  caption String      @db.VarChar
+  type    String      @db.VarChar
+  works   Portfolio[]
+
+  @@map("nsi_filter_types")
+}
+
+model Portfolio {
+  id                   Int                   @id(map: "portfolio_pk") @default(autoincrement())
+  typeId               Int?                  @map("type")
+  sizesRoom            String                @map("sizes_room") @db.VarChar
+  sizesFurniture       String                @map("sizes_furniture") @db.VarChar
+  housingMaterial      String                @map("housing_material") @db.VarChar
+  facadeMaterial       String                @map("facade_material") @db.VarChar
+  tableTopMaterial     String                @map("table_top_material") @db.VarChar
+  bodyColorId          Int?                  @map("body_color")
+  tableTopColorId      Int?                  @map("table_top_color")
+  furnitureAccessories String                @map("furniture_accessories") @db.VarChar
+  name                 String                @db.VarChar
+  title                String                @db.VarChar
+  layoutId             Int?                  @map("layout")
+  price                Int
+  description          String                @db.VarChar
+  styleId              Int?                  @map("style")
+  bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_7c0b2cf87b30c2c8409fe8606c4")
+  tableTopColor        Color?                @relation("TableTopColor", fields: [tableTopColorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_80ffe87a234feced1adbf08d10f")
+  type                 FilterType?           @relation(fields: [typeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_9f6d501566176ab802d25958643")
+  style                FilterStyle?          @relation(fields: [styleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f1b248d1c9f62f6404a2233ec9f")
+  layout               FilterLayout?         @relation(fields: [layoutId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f7eafafe60d6618cf1deb6f5891")
+  colorsList           PortfolioColorsList[]
+  imagesList           PortfolioImagesList[]
+
+  @@map("portfolio")
+}
+
+model PortfolioColorsList {
+  id      Int        @id(map: "portfolio_colors_list_pk") @default(autoincrement())
+  workId  Int?       @map("work")
+  colorId Int?       @map("color")
+  work    Portfolio? @relation(fields: [workId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_1d8b3530aeeac67ad13236d9299")
+  color   Color?     @relation(fields: [colorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6fc575572cbb92b9567cc07bf41")
+
+  @@map("portfolio_colors_list")
+}
+
+model PortfolioImagesList {
+  id      Int        @id(map: "portfolio_images_list_pk") @default(autoincrement())
+  workId  Int?       @map("work")
+  imageId Int?       @map("image")
+  work    Portfolio? @relation(fields: [workId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_24e0e277406a571261c8724940c")
+  image   Image?     @relation(fields: [imageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f729ba5dfd107ac9a2d93667658")
+
+  @@map("portfolio_images_list")
+}
+
+model Category {
+  id        Int        @id(map: "categories_pk") @default(autoincrement())
+  category  String     @db.VarChar
+  questions Question[]
+
+  @@map("nsi_questions_categories")
+}
+
+model Question {
+  id                  Int       @id(map: "questions_pk") @default(autoincrement())
+  question            String    @db.VarChar
+  categoryId          Int?      @map("categoryId")
+  questionDescription String    @map("question_description") @db.VarChar
+  category            Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f7f9c25bf2bac126d941673a7dc")
+
+  @@map("questions")
+}

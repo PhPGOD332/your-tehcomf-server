@@ -1,17 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Category } from './Category';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('questions')
-export class Question {
-  @PrimaryGeneratedColumn()
+export class QuestionEntity {
+  @ApiProperty()
   id: number;
 
-  @Column()
+  @ApiProperty()
   question: string;
 
-  @Column({ name: 'question_description' })
+  @ApiProperty({ name: 'question_description' })
   questionDescription: string;
 
-  @ManyToOne(() => Category, (category) => category.id)
-  category: Category;
+  @ApiProperty({ type: Number, required: false })
+  categoryId?: number;
 }

@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { FilterLayoutsService } from './filter_layouts.service';
-import { FilterLayout } from './entities/FilterLayout';
+import { FilterLayout } from '@prisma/client';
 
 @Controller('filter-layouts')
 export class FilterLayoutsController {
@@ -8,6 +8,6 @@ export class FilterLayoutsController {
 
   @Get('')
   async getFilterStyles(): Promise<FilterLayout[]> {
-    return await this.filterStylesLayout.getFilterLayouts();
+    return this.filterStylesLayout.getFilterLayouts();
   }
 }

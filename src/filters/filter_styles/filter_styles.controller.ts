@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { FilterStylesService } from './filter_styles.service';
-import { FilterStyle } from './entities/FilterStyle';
+import { FilterStyle } from '@prisma/client';
 
 @Controller('filter-styles')
 export class FilterStylesController {
@@ -8,6 +8,6 @@ export class FilterStylesController {
 
   @Get('')
   async getFilterStyles(): Promise<FilterStyle[]> {
-    return await this.filterStylesService.getFilterStyles();
+    return this.filterStylesService.getFilterStyles();
   }
 }

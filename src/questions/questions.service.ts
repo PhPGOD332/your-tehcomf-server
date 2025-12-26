@@ -1,23 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Category } from './entities';
+import { Category } from '@prisma/client';
+import { PrismaService } from '@/database';
 
 @Injectable()
 export class QuestionsService {
-  constructor(
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   getAllCategories(): Promise<Category[]> {
-    return this.categoryRepository.find();
+    return this.prisma.category.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+    });
   }
 
   getQuestionsByCategories(): Promise<Category[]> {
-    return this.categoryRepository.find({
-      relations: {
-        questions: true,
+    return this.prisma.category.findMany({
+      include: {
+        questions: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        id: 'asc',
       },
     });
   }
