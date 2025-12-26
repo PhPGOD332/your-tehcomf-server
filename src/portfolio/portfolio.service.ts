@@ -59,7 +59,7 @@ export class PortfolioService {
     // Если нет фильтрации
     const portfolios = await this.portfolioRepository.find({
       // where:
-      relations: ['type', 'layout', 'bodyColor', 'tableTopColor'],
+      relations: ['type', 'layout', 'style', 'bodyColor', 'tableTopColor'],
     });
 
     const portfoliosDTO: PortfolioDto[] = [];
@@ -84,7 +84,7 @@ export class PortfolioService {
   async getPortfolioItem(name: string): Promise<PortfolioDto | null> {
     const portfolio = await this.portfolioRepository.findOne({
       where: { name: name },
-      relations: ['type', 'layout', 'bodyColor', 'tableTopColor'],
+      relations: ['type', 'layout', 'style', 'bodyColor', 'tableTopColor'],
     });
 
     if (!portfolio) return null;
