@@ -9,8 +9,8 @@ datasource db {
 
 model Image {
   id       Int                   @id(map: "images_pk") @default(autoincrement())
-  src      String                @map("image") @db.VarChar
-  imageAlt String                @map("image_alt") @db.VarChar
+  src      String                @map("image")
+  imageAlt String                @map("image_alt")
   width    Int?
   height   Int?
   order    Int?                  @map("order")
@@ -21,10 +21,10 @@ model Image {
 
 model Color {
   id            Int                   @id(map: "nsi_colors_pk") @default(autoincrement())
-  name          String                @db.VarChar
-  caption       String                @db.VarChar
-  hexCode       String                @map("hex_code") @db.VarChar
-  captionCode   String?               @map("caption_code") @db.VarChar
+  name          String
+  caption       String
+  hexCode       String                @map("hex_code")
+  captionCode   String?               @map("caption_code")
   bodyWorks     Portfolio[]           @relation("BodyColor")
   tableTopWorks Portfolio[]           @relation("TableTopColor")
   palette       PortfolioColorsList[]
@@ -34,9 +34,9 @@ model Color {
 
 model FilterColor {
   id      Int    @id(map: "nsi_filter_colors_pk") @default(autoincrement())
-  name    String @db.VarChar
-  caption String @db.VarChar
-  type    String @db.VarChar
+  name    String
+  caption String
+  type    String
   order   Int
 
   @@map("nsi_filter_colors")
@@ -44,9 +44,9 @@ model FilterColor {
 
 model FilterLayout {
   id      Int         @id(map: "nsi_filter_styles_pk") @default(autoincrement())
-  name    String      @db.VarChar
-  caption String      @db.VarChar
-  type    String      @db.VarChar
+  name    String
+  caption String
+  type    String
   order   Int
   works   Portfolio[]
 
@@ -55,9 +55,9 @@ model FilterLayout {
 
 model FilterStyle {
   id      Int         @id @default(autoincrement())
-  name    String      @db.VarChar
-  caption String      @db.VarChar
-  type    String      @db.VarChar
+  name    String
+  caption String
+  type    String
   order   Int
   works   Portfolio[]
 
@@ -68,9 +68,9 @@ model FilterBudget {
   id       Int    @id(map: "nsi_filter_budget_pk") @default(autoincrement())
   minValue Int?   @map("min_value")
   maxValue Int?   @map("max_value")
-  caption  String @db.VarChar
-  name     String @db.VarChar
-  type     String @db.VarChar
+  caption  String
+  name     String
+  type     String
   order    Int
 
   @@map("nsi_filter_budgets")
@@ -78,9 +78,9 @@ model FilterBudget {
 
 model FilterType {
   id      Int         @id(map: "nsi_filter_types_pk") @default(autoincrement())
-  name    String      @db.VarChar
-  caption String      @db.VarChar
-  type    String      @db.VarChar
+  name    String
+  caption String
+  type    String
   works   Portfolio[]
 
   @@map("nsi_filter_types")
@@ -89,25 +89,25 @@ model FilterType {
 model Portfolio {
   id                   Int                   @id(map: "portfolio_pk") @default(autoincrement())
   typeId               Int?                  @map("type")
-  sizesRoom            String?               @map("sizes_room") @db.VarChar
-  sizesFurniture       String?               @map("sizes_furniture") @db.VarChar
-  housingMaterial      String?               @map("housing_material") @db.VarChar
-  facadeMaterial       String?               @map("facade_material") @db.VarChar
-  tableTopMaterial     String?               @map("table_top_material") @db.VarChar
+  sizesRoom            String?               @map("sizes_room")
+  sizesFurniture       String?               @map("sizes_furniture")
+  housingMaterial      String?               @map("housing_material")
+  facadeMaterial       String?               @map("facade_material")
+  tableTopMaterial     String?               @map("table_top_material")
   bodyColorId          Int?                  @map("body_color")
   tableTopColorId      Int?                  @map("table_top_color")
-  furnitureAccessories String?               @map("furniture_accessories") @db.VarChar
-  name                 String                @db.VarChar
-  title                String                @db.VarChar
+  furnitureAccessories String?               @map("furniture_accessories")
+  name                 String
+  title                String
   layoutId             Int?                  @map("layout")
   price                Int
-  description          String?               @db.VarChar
+  description          String?
   styleId              Int?                  @map("style")
-  bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_7c0b2cf87b30c2c8409fe8606c4")
-  tableTopColor        Color?                @relation("TableTopColor", fields: [tableTopColorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_80ffe87a234feced1adbf08d10f")
-  type                 FilterType?           @relation(fields: [typeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_9f6d501566176ab802d25958643")
-  style                FilterStyle?          @relation(fields: [styleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f1b248d1c9f62f6404a2233ec9f")
-  layout               FilterLayout?         @relation(fields: [layoutId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f7eafafe60d6618cf1deb6f5891")
+  bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id])
+  tableTopColor        Color?                @relation("TableTopColor", fields: [tableTopColorId], references: [id])
+  type                 FilterType?           @relation(fields: [typeId], references: [id])
+  style                FilterStyle?          @relation(fields: [styleId], references: [id])
+  layout               FilterLayout?         @relation(fields: [layoutId], references: [id])
   colorsList           PortfolioColorsList[]
   imagesList           PortfolioImagesList[]
 
@@ -118,8 +118,8 @@ model PortfolioColorsList {
   id      Int        @id(map: "portfolio_colors_list_pk") @default(autoincrement())
   workId  Int?       @map("work")
   colorId Int?       @map("color")
-  work    Portfolio? @relation(fields: [workId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_1d8b3530aeeac67ad13236d9299")
-  color   Color?     @relation(fields: [colorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6fc575572cbb92b9567cc07bf41")
+  work    Portfolio? @relation(fields: [workId], references: [id])
+  color   Color?     @relation(fields: [colorId], references: [id])
 
   @@map("portfolio_colors_list")
 }
@@ -128,15 +128,15 @@ model PortfolioImagesList {
   id      Int        @id(map: "portfolio_images_list_pk") @default(autoincrement())
   workId  Int?       @map("work")
   imageId Int?       @map("image")
-  work    Portfolio? @relation(fields: [workId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_24e0e277406a571261c8724940c")
-  image   Image?     @relation(fields: [imageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f729ba5dfd107ac9a2d93667658")
+  work    Portfolio? @relation(fields: [workId], references: [id])
+  image   Image?     @relation(fields: [imageId], references: [id])
 
   @@map("portfolio_images_list")
 }
 
 model Category {
   id        Int        @id(map: "categories_pk") @default(autoincrement())
-  category  String     @db.VarChar
+  category  String
   questions Question[]
 
   @@map("nsi_questions_categories")
@@ -144,10 +144,10 @@ model Category {
 
 model Question {
   id                  Int       @id(map: "questions_pk") @default(autoincrement())
-  question            String    @db.VarChar
+  question            String
   categoryId          Int?      @map("categoryId")
-  questionDescription String    @map("question_description") @db.VarChar
-  category            Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f7f9c25bf2bac126d941673a7dc")
+  questionDescription String    @map("question_description")
+  category            Category? @relation(fields: [categoryId], references: [id])
 
   @@map("questions")
 }

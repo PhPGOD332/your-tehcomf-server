@@ -128,10 +128,13 @@ export class PortfolioService {
       });
 
       if (budgetById) {
+        const minBudgetValue = budgetById.minValue ?? undefined;
+        const maxBudgetValue = budgetById.maxValue ?? undefined;
+
         return {
           price: {
-            gte: budgetById.minValue,
-            lte: budgetById.maxValue,
+            ...(minBudgetValue !== undefined ? { gte: minBudgetValue } : {}),
+            ...(maxBudgetValue !== undefined ? { lte: maxBudgetValue } : {}),
           },
         };
       }
@@ -147,10 +150,13 @@ export class PortfolioService {
       return undefined;
     }
 
+    const minBudgetValue = budgetByName.minValue ?? undefined;
+    const maxBudgetValue = budgetByName.maxValue ?? undefined;
+
     return {
       price: {
-        gte: budgetByName.minValue,
-        lte: budgetByName.maxValue,
+        ...(minBudgetValue !== undefined ? { gte: minBudgetValue } : {}),
+        ...(maxBudgetValue !== undefined ? { lte: maxBudgetValue } : {}),
       },
     };
   }
