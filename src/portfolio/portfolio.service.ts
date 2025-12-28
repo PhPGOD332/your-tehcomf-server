@@ -42,6 +42,7 @@ export class PortfolioService {
       type: true,
       layout: true,
       style: true,
+      color: true,
       bodyColor: true,
       tableTopColor: true,
       colorsList: {
@@ -104,11 +105,12 @@ export class PortfolioService {
         return { layout: { name: normalizedValue } };
       case 'color':
         return {
-          OR: [
-            { bodyColor: { name: normalizedValue } },
-            { tableTopColor: { name: normalizedValue } },
-            { colorsList: { some: { color: { name: normalizedValue } } } },
-          ],
+          color: { name: normalizedValue },
+          // OR: [
+          // { bodyColor: { name: normalizedValue } },
+          // { tableTopColor: { name: normalizedValue } },
+          // { colorsList: { some: { color: { name: normalizedValue } } } },
+          // ],
         };
       case 'budget':
         return this.findBudgetFilter(normalizedValue);

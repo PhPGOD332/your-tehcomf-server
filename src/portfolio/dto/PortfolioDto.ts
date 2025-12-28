@@ -1,5 +1,6 @@
 import type {
   Color,
+  FilterColor,
   FilterLayout,
   FilterStyle,
   FilterType,
@@ -13,6 +14,7 @@ export type PortfolioWithRelations = Portfolio & {
   type: FilterType | null;
   style: FilterStyle | null;
   layout: FilterLayout | null;
+  color: FilterColor | null;
   bodyColor: Color | null;
   tableTopColor: Color | null;
   colorsList: (PortfolioColorsList & { color: Color | null })[];
@@ -28,6 +30,7 @@ export class PortfolioDto {
   readonly type: FilterType | null;
   readonly style: FilterStyle | null;
   readonly layout: FilterLayout | null;
+  readonly color: FilterColor | null;
   readonly sizesRoom: string | null;
   readonly sizesFurniture: string | null;
   readonly housingMaterial: string | null;
@@ -51,6 +54,7 @@ export class PortfolioDto {
     this.type = portfolio.type;
     this.style = portfolio.style;
     this.layout = portfolio.layout;
+    this.color = portfolio.color;
     this.sizesRoom = portfolio.sizesRoom ?? null;
     this.sizesFurniture = portfolio.sizesFurniture ?? null;
     this.housingMaterial = portfolio.housingMaterial ?? null;

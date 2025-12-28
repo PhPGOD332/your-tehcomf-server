@@ -33,11 +33,12 @@ model Color {
 }
 
 model FilterColor {
-  id      Int    @id(map: "nsi_filter_colors_pk") @default(autoincrement())
-  name    String
-  caption String
-  type    String
-  order   Int
+  id         Int         @id(map: "nsi_filter_colors_pk") @default(autoincrement())
+  name       String
+  caption    String
+  type       String
+  order      Int
+  portfolios Portfolio[]
 
   @@map("nsi_filter_colors")
 }
@@ -94,20 +95,22 @@ model Portfolio {
   housingMaterial      String?               @map("housing_material")
   facadeMaterial       String?               @map("facade_material")
   tableTopMaterial     String?               @map("table_top_material")
-  bodyColorId          Int?                  @map("body_color")
   tableTopColorId      Int?                  @map("table_top_color")
   furnitureAccessories String?               @map("furniture_accessories")
   name                 String
   title                String
-  layoutId             Int?                  @map("layout")
   price                Int
   description          String?
-  styleId              Int?                  @map("style")
   bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id])
+  bodyColorId          Int?                  @map("body_color")
   tableTopColor        Color?                @relation("TableTopColor", fields: [tableTopColorId], references: [id])
   type                 FilterType?           @relation(fields: [typeId], references: [id])
   style                FilterStyle?          @relation(fields: [styleId], references: [id])
+  styleId              Int?                  @map("style")
   layout               FilterLayout?         @relation(fields: [layoutId], references: [id])
+  layoutId             Int?                  @map("layout")
+  color                FilterColor?          @relation(fields: [colorId], references: [id])
+  colorId              Int?                  @map("color")
   colorsList           PortfolioColorsList[]
   imagesList           PortfolioImagesList[]
 
