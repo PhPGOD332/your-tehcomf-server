@@ -25,6 +25,7 @@ export class PortfolioDto {
   readonly id: number;
   readonly name: string;
   readonly title: string;
+  readonly subtitle: string | null;
   readonly description: string | null;
   readonly images: Image[];
   readonly type: FilterType | null;
@@ -46,6 +47,7 @@ export class PortfolioDto {
     this.id = portfolio.id;
     this.name = portfolio.name;
     this.title = portfolio.title;
+    this.subtitle = portfolio.subtitle ?? null;
     this.description = portfolio.description ?? null;
     this.images = (portfolio.imagesList ?? [])
       .map((list) => list.image)

@@ -99,6 +99,7 @@ model Portfolio {
   furnitureAccessories String?               @map("furniture_accessories")
   name                 String
   title                String
+  subtitle             String?
   price                Int
   description          String?
   bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id])
