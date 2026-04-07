@@ -7,15 +7,18 @@ export class Image {
   @ApiProperty({ name: 'image' })
   src: string;
 
+  @ApiProperty({ required: false, nullable: true })
+  s3Key?: string | null;
+
   @ApiProperty({ name: 'image_alt' })
   imageAlt: string;
 
-  @ApiProperty()
-  width: number;
+  @ApiProperty({ required: false, nullable: true })
+  width?: number | null;
 
-  @ApiProperty()
-  height: number;
+  @ApiProperty({ required: false, nullable: true })
+  height?: number | null;
 
-  @ApiProperty()
-  order: number;
+  @ApiProperty({ required: false, nullable: true })
+  order?: number | null;
 }

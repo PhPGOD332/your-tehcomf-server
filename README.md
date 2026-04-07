@@ -25,6 +25,74 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## API Documentation (Swagger)
+
+- Swagger UI: `GET /docs`
+- Base API prefix: `GET /api/*`
+- JWT схема: `Bearer <accessToken>` (кнопка `Authorize` в Swagger)
+- Auth lifecycle: `login` -> `refresh` -> `logout`
+- JWT env:
+  - `JWT_ACCESS_SECRET` (или fallback `JWT_SECRET`)
+  - `JWT_ACCESS_EXPIRES_IN` (по умолчанию `15m`)
+  - `JWT_REFRESH_SECRET`
+  - `JWT_REFRESH_EXPIRES_IN` (по умолчанию `30d`)
+
+## Postman
+
+- Коллекция для проверки `access/refresh` и `filter_type.cardCaption`:
+  - `postman/tehcomf-auth-refresh-and-filter-type.postman_collection.json`
+  - переменная `server` уже добавлена
+
+## Admin Authorization Flow
+
+1. Подготовить БД:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+2. Создать первого владельца (только один раз, если таблица `users` пуста):
+
+```http
+POST /api/auth/bootstrap-owner
+{
+  "email": "owner@tehcomf.ru",
+  "password": "StrongPassword_123"
+}
+```
+
+3. Логин в админку (вернет `accessToken` + `refreshToken`):
+
+```http
+POST /api/auth/login
+{
+  "email": "owner@tehcomf.ru",
+  "password": "StrongPassword_123"
+}
+```
+
+4. Обновление токенов по `refreshToken`:
+
+```http
+POST /api/auth/refresh
+{
+  "refreshToken": "<refreshToken>"
+}
+```
+
+5. Выход из системы:
+
+```http
+POST /api/auth/logout
+Authorization: Bearer <accessToken>
+```
+
+6. Вставить `accessToken` в Swagger (`Authorize`) и использовать защищенные роуты:
+- `Users` (управление пользователями/ролями, только владелец)
+- `Admin Gallery` (загрузка фото в S3, готовые абсолютные URL)
+- `Admin Content` (CRUD всех контентных сущностей)
+
 ## Project setup
 
 ```bash

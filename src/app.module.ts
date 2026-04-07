@@ -3,33 +3,37 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { PortfolioModule } from './portfolio/portfolio.module';
+import { PortfolioModule } from './crud/portfolio/portfolio.module';
 import {
   FilterBudgetsModule,
   FilterColorsModule,
   FilterLayoutsModule,
   FilterStylesModule,
   FilterTypesModule,
-} from './filters';
-import { DatabaseModule } from './database';
-import { ClaimsModule } from './claims';
-import { MailModule } from './mail';
-import { ColorsModule } from './colors';
-import { QuestionsModule } from './questions';
+} from './crud/filters';
+import { DatabaseModule } from './crud/database';
+import { ClaimsModule } from './crud/claims';
+import { MailModule } from './crud/mail';
+import { ColorsModule } from './crud/colors';
+import { QuestionsModule } from './crud/questions';
+import { AuthModule } from './auth';
+import { UsersModule } from './crud/users';
+import { MediaModule } from './crud/media';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../data/images'),
       serveRoot: '/images/',
     }),
     MailerModule.forRootAsync({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
-      ],
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         transport: {
@@ -48,6 +52,9 @@ import { QuestionsModule } from './questions';
     ClaimsModule,
     MailModule,
     QuestionsModule,
+    UsersModule,
+    AuthModule,
+    MediaModule,
     ColorsModule,
     FilterColorsModule,
     FilterTypesModule,
@@ -57,6 +64,15 @@ import { QuestionsModule } from './questions';
     FilterLayoutsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -7,9 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  USER
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  refreshTokenHash String? @map("refresh_token_hash")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  role         Role     @default(USER)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
 model Image {
   id       Int                   @id(map: "images_pk") @default(autoincrement())
   src      String                @map("image")
+  s3Key    String?               @map("s3_key")
   imageAlt String                @map("image_alt")
   width    Int?
   height   Int?
@@ -78,11 +100,12 @@ model FilterBudget {
 }
 
 model FilterType {
-  id      Int         @id(map: "nsi_filter_types_pk") @default(autoincrement())
-  name    String
-  caption String
-  type    String
-  works   Portfolio[]
+  id          Int         @id(map: "nsi_filter_types_pk") @default(autoincrement())
+  name        String
+  caption     String
+  cardCaption String?     @map("card_caption")
+  type        String
+  works       Portfolio[]
 
   @@map("nsi_filter_types")
 }

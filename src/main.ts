@@ -14,6 +14,16 @@ async function bootstrap() {
       'API документация к сайту TehComf (<a href="https://tehcomf.ru" target="_blank">https://tehcomf.ru</a>)',
     )
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access-token',
+    )
     .setContact(
       'Kireev Kirill',
       'https://t.me/ker4ik13',
@@ -26,10 +36,10 @@ async function bootstrap() {
   app.enableCors({
     credentials: true,
     origin: process.env.CLIENT_URL,
-    methods: ['POST', 'PUT', 'GET', 'OPTIONS'],
+    methods: ['POST', 'PUT', 'PATCH', 'DELETE', 'GET', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
   await app.listen(process.env.PORT ?? 3001);
   console.log(`Application is running on: ${process.env.PORT} port`);
 }
-bootstrap();
+void bootstrap();
