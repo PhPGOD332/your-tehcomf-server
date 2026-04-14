@@ -16,7 +16,7 @@ import { randomUUID } from 'crypto';
 import { UploadGalleryImageDto } from './dto/upload-gallery-image.dto';
 import { UpdateGalleryImageDto } from './dto/update-gallery-image.dto';
 import { resolveAbsoluteMediaUrl } from '@/common/media-url.util';
-import { Image } from '@prisma/client';
+import { Image, Prisma } from '@prisma/client';
 
 @Injectable()
 export class MediaService {
@@ -91,16 +91,16 @@ export class MediaService {
       );
     }
 
-    const image = await this.prisma.image.create({
-      data: {
-        src: this.buildPublicUrl(key),
-        s3Key: key,
-        imageAlt: uploadDto.imageAlt?.trim() || file.originalname,
-        order: uploadDto.order,
-        width: uploadDto.width,
-        height: uploadDto.height,
-      },
-    });
+    const imageCreateData: Prisma.ImageCreateInput = {
+      src: this.buildPublicUrl(key),
+      s3Key: key,
+      imageAlt: uploadDto.imageAlt?.trim() || file.originalname,
+      order: uploadDto.order,
+      width: uploadDto.width,
+      height: uploadDto.height,
+    };
+
+    const image = await this.createImageWithRetry(imageCreateData, key);
 
     return this.withAbsoluteUrl(image);
   }
@@ -165,6 +165,82 @@ export class MediaService {
     }
 
     return image;
+  }
+
+  private async createImageWithRetry(
+    imageCreateData: Prisma.ImageCreateInput,
+    s3Key: string,
+  ): Promise<Image> {
+    try {
+      return await this.prisma.image.create({
+        data: imageCreateData,
+      });
+    } catch (error) {
+      if (this.isDuplicateImageIdError(error)) {
+        try {
+          await this.resyncImageIdSequence();
+          return await this.prisma.image.create({
+            data: imageCreateData,
+          });
+        } catch (retryError) {
+          await this.tryDeleteS3Object(s3Key);
+          throw this.createImagePersistException(retryError);
+        }
+      }
+
+      await this.tryDeleteS3Object(s3Key);
+      throw this.createImagePersistException(error);
+    }
+  }
+
+  private isDuplicateImageIdError(error: unknown): boolean {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+      return false;
+    }
+
+    if (error.code !== 'P2002') {
+      return false;
+    }
+
+    const target = error.meta?.target;
+
+    if (Array.isArray(target)) {
+      return target.includes('id');
+    }
+
+    return typeof target === 'string' && target.includes('id');
+  }
+
+  private async resyncImageIdSequence(): Promise<void> {
+    await this.prisma.$executeRaw`
+      SELECT setval(
+        pg_get_serial_sequence('"nsi_images"', 'id'),
+        COALESCE((SELECT MAX(id) FROM "nsi_images"), 0) + 1,
+        false
+      );
+    `;
+  }
+
+  private createImagePersistException(
+    error: unknown,
+  ): InternalServerErrorException {
+    return new InternalServerErrorException(
+      'Файл загружен в S3, но не удалось сохранить запись в БД',
+      { cause: error },
+    );
+  }
+
+  private async tryDeleteS3Object(key: string): Promise<void> {
+    try {
+      await this.s3Client.send(
+        new DeleteObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+        }),
+      );
+    } catch {
+      // Игнорируем ошибку очистки, чтобы не потерять первичную причину сбоя записи в БД.
+    }
   }
 
   private withAbsoluteUrl(image: Image): Image {
