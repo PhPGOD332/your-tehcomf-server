@@ -15,27 +15,27 @@ enum Role {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  refreshTokenHash String? @map("refresh_token_hash")
+  id                    Int       @id @default(autoincrement())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  refreshTokenHash      String?   @map("refresh_token_hash")
   refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
-  role         Role     @default(USER)
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  role                  Role      @default(USER)
+  isActive              Boolean   @default(true) @map("is_active")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Image {
   id       Int                   @id(map: "images_pk") @default(autoincrement())
-  src      String                @map("image")
-  s3Key    String?               @map("s3_key")
   imageAlt String                @map("image_alt")
   width    Int?
   height   Int?
   order    Int?                  @map("order")
+  s3Key    String?               @map("s3_key")
+  src      String
   images   PortfolioImagesList[]
 
   @@map("nsi_images")
@@ -103,8 +103,8 @@ model FilterType {
   id          Int         @id(map: "nsi_filter_types_pk") @default(autoincrement())
   name        String
   caption     String
-  cardCaption String?     @map("card_caption")
   type        String
+  cardCaption String?     @map("card_caption")
   works       Portfolio[]
 
   @@map("nsi_filter_types")
@@ -118,23 +118,23 @@ model Portfolio {
   housingMaterial      String?               @map("housing_material")
   facadeMaterial       String?               @map("facade_material")
   tableTopMaterial     String?               @map("table_top_material")
+  bodyColorId          Int?                  @map("body_color")
   tableTopColorId      Int?                  @map("table_top_color")
   furnitureAccessories String?               @map("furniture_accessories")
   name                 String
   title                String
-  subtitle             String?
+  layoutId             Int?                  @map("layout")
   price                Int
   description          String?
+  styleId              Int?                  @map("style")
+  colorId              Int?                  @map("color")
+  subtitle             String?
   bodyColor            Color?                @relation("BodyColor", fields: [bodyColorId], references: [id])
-  bodyColorId          Int?                  @map("body_color")
+  color                FilterColor?          @relation(fields: [colorId], references: [id])
+  layout               FilterLayout?         @relation(fields: [layoutId], references: [id])
+  style                FilterStyle?          @relation(fields: [styleId], references: [id])
   tableTopColor        Color?                @relation("TableTopColor", fields: [tableTopColorId], references: [id])
   type                 FilterType?           @relation(fields: [typeId], references: [id])
-  style                FilterStyle?          @relation(fields: [styleId], references: [id])
-  styleId              Int?                  @map("style")
-  layout               FilterLayout?         @relation(fields: [layoutId], references: [id])
-  layoutId             Int?                  @map("layout")
-  color                FilterColor?          @relation(fields: [colorId], references: [id])
-  colorId              Int?                  @map("color")
   colorsList           PortfolioColorsList[]
   imagesList           PortfolioImagesList[]
 
@@ -145,8 +145,8 @@ model PortfolioColorsList {
   id      Int        @id(map: "portfolio_colors_list_pk") @default(autoincrement())
   workId  Int?       @map("work")
   colorId Int?       @map("color")
-  work    Portfolio? @relation(fields: [workId], references: [id])
   color   Color?     @relation(fields: [colorId], references: [id])
+  work    Portfolio? @relation(fields: [workId], references: [id])
 
   @@map("portfolio_colors_list")
 }
@@ -155,8 +155,8 @@ model PortfolioImagesList {
   id      Int        @id(map: "portfolio_images_list_pk") @default(autoincrement())
   workId  Int?       @map("work")
   imageId Int?       @map("image")
-  work    Portfolio? @relation(fields: [workId], references: [id])
   image   Image?     @relation(fields: [imageId], references: [id])
+  work    Portfolio? @relation(fields: [workId], references: [id])
 
   @@map("portfolio_images_list")
 }

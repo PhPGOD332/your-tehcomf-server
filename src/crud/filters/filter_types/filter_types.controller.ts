@@ -24,7 +24,10 @@ import { FilterType as FilterTypeModel } from '@prisma/client';
 import { FilterType } from './entites/FilterType';
 import { Public } from '@/auth/decorators/public.decorator';
 import { AdminAccess } from '@/auth/decorators/admin-access.decorator';
-import { CreateFilterTypeDto, UpdateFilterTypeDto } from './dto/filter-type.dto';
+import {
+  CreateFilterTypeDto,
+  UpdateFilterTypeDto,
+} from './dto/filter-type.dto';
 
 @ApiTags('Filter Types')
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
