@@ -105,6 +105,32 @@ export class MediaService {
     return this.withAbsoluteUrl(image);
   }
 
+  async uploadGalleryImages(
+    files: Express.Multer.File[],
+    uploadItems: UploadGalleryImageDto[],
+  ): Promise<Image[]> {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Нужно передать хотя бы один файл');
+    }
+
+    if (!uploadItems || uploadItems.length !== files.length) {
+      throw new BadRequestException(
+        'Количество элементов items должно совпадать с количеством файлов',
+      );
+    }
+
+    const uploadedImages: Image[] = [];
+
+    for (let index = 0; index < files.length; index += 1) {
+      const file = files[index];
+      const uploadDto = uploadItems[index] ?? {};
+      const image = await this.uploadGalleryImage(file, uploadDto);
+      uploadedImages.push(image);
+    }
+
+    return uploadedImages;
+  }
+
   async updateGalleryImage(
     id: number,
     updateDto: UpdateGalleryImageDto,

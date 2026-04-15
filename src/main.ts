@@ -3,12 +3,23 @@ import { AppModule } from './app.module';
 import * as process from 'process';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConsoleLogger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
 
-  const config = new DocumentBuilder()
+  // Logger
+  app.useLogger(new ConsoleLogger());
+  const logger = new ConsoleLogger();
+  logger.setContext('Main');
+
+  // Config
+  const config = app.get(ConfigService);
+  const API_URL = config.getOrThrow<string>('API_URL');
+
+  const swagger = new DocumentBuilder()
     .setTitle('TehComf API server')
     .setDescription(
       'API документация к сайту TehComf (<a href="https://tehcomf.ru" target="_blank">https://tehcomf.ru</a>)',
@@ -30,7 +41,7 @@ async function bootstrap() {
       'kireev.kirill2004@mail.ru',
     )
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = () => SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('docs', app, documentFactory);
 
   app.enableCors({
@@ -40,6 +51,7 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
   await app.listen(process.env.PORT ?? 3001);
-  console.log(`Application is running on: ${process.env.PORT} port`);
+  logger.log(`🚀 Backend server started: ${API_URL}`);
+  logger.log(`📊 Swagger: ${API_URL}/docs`);
 }
 void bootstrap();
