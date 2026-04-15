@@ -80,21 +80,15 @@ export class PortfolioService {
       });
 
       if (dto.facadeColorIds?.length) {
-        await tx.portfolioColorsList.createMany({
-          data: dto.facadeColorIds.map((colorId) => ({
-            workId: portfolio.id,
-            colorId,
-          })),
-        });
+        await this.createPortfolioColorLinks(
+          tx,
+          portfolio.id,
+          dto.facadeColorIds,
+        );
       }
 
       if (dto.imageIds?.length) {
-        await tx.portfolioImagesList.createMany({
-          data: dto.imageIds.map((imageId) => ({
-            workId: portfolio.id,
-            imageId,
-          })),
-        });
+        await this.createPortfolioImageLinks(tx, portfolio.id, dto.imageIds);
       }
 
       return tx.portfolio.findUniqueOrThrow({
@@ -140,12 +134,7 @@ export class PortfolioService {
         await tx.portfolioColorsList.deleteMany({ where: { workId: id } });
 
         if (dto.facadeColorIds.length) {
-          await tx.portfolioColorsList.createMany({
-            data: dto.facadeColorIds.map((colorId) => ({
-              workId: id,
-              colorId,
-            })),
-          });
+          await this.createPortfolioColorLinks(tx, id, dto.facadeColorIds);
         }
       }
 
@@ -153,12 +142,7 @@ export class PortfolioService {
         await tx.portfolioImagesList.deleteMany({ where: { workId: id } });
 
         if (dto.imageIds.length) {
-          await tx.portfolioImagesList.createMany({
-            data: dto.imageIds.map((imageId) => ({
-              workId: id,
-              imageId,
-            })),
-          });
+          await this.createPortfolioImageLinks(tx, id, dto.imageIds);
         }
       }
 
@@ -332,5 +316,97 @@ export class PortfolioService {
     if (!portfolio) {
       throw new NotFoundException(`Портфолио с id=${id} не найдено`);
     }
+  }
+
+  private async createPortfolioColorLinks(
+    tx: Prisma.TransactionClient,
+    workId: number,
+    colorIds: number[],
+  ): Promise<void> {
+    await this.createManyWithIdRetry(
+      () =>
+        tx.portfolioColorsList.createMany({
+          data: colorIds.map((colorId) => ({
+            workId,
+            colorId,
+          })),
+        }),
+      () => this.resyncPortfolioColorsListIdSequence(tx),
+    );
+  }
+
+  private async createPortfolioImageLinks(
+    tx: Prisma.TransactionClient,
+    workId: number,
+    imageIds: number[],
+  ): Promise<void> {
+    await this.createManyWithIdRetry(
+      () =>
+        tx.portfolioImagesList.createMany({
+          data: imageIds.map((imageId) => ({
+            workId,
+            imageId,
+          })),
+        }),
+      () => this.resyncPortfolioImagesListIdSequence(tx),
+    );
+  }
+
+  private async createManyWithIdRetry(
+    action: () => Promise<Prisma.BatchPayload>,
+    resyncIdSequence: () => Promise<void>,
+  ): Promise<void> {
+    try {
+      await action();
+    } catch (error) {
+      if (!this.isDuplicateIdError(error)) {
+        throw error;
+      }
+
+      await resyncIdSequence();
+      await action();
+    }
+  }
+
+  private isDuplicateIdError(error: unknown): boolean {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+      return false;
+    }
+
+    if (error.code !== 'P2002') {
+      return false;
+    }
+
+    const target = error.meta?.target;
+
+    if (Array.isArray(target)) {
+      return target.includes('id');
+    }
+
+    return typeof target === 'string' && target.includes('id');
+  }
+
+  private async resyncPortfolioColorsListIdSequence(
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    await tx.$executeRaw`
+      SELECT setval(
+        pg_get_serial_sequence('"portfolio_colors_list"', 'id'),
+        COALESCE((SELECT MAX(id) FROM "portfolio_colors_list"), 0) + 1,
+        false
+      );
+    `;
+  }
+
+  private async resyncPortfolioImagesListIdSequence(
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    await tx.$executeRaw`
+      SELECT setval(
+        pg_get_serial_sequence('"portfolio_images_list"', 'id'),
+        COALESCE((SELECT MAX(id) FROM "portfolio_images_list"), 0) + 1,
+        false
+      );
+    `;
   }
 }
