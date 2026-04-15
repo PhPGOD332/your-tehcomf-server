@@ -103,7 +103,9 @@ export class PortfolioController {
   @ApiResponse({ status: 201, type: PortfolioDto })
   @AdminAccess()
   @Post('')
-  async createPortfolio(@Body() dto: CreatePortfolioDto): Promise<PortfolioDto> {
+  async createPortfolio(
+    @Body() dto: CreatePortfolioDto,
+  ): Promise<PortfolioDto> {
     return this.portfolioService.createPortfolio(dto);
   }
 

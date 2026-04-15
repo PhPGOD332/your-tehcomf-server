@@ -4,7 +4,10 @@ import { Prisma } from '@prisma/client';
 import { PortfolioDto, PortfolioWithRelations } from './dto/PortfolioDto';
 import { TFilterType } from '@/shared';
 import { resolveAbsoluteMediaUrl } from '@/common/media-url.util';
-import { CreatePortfolioDto, UpdatePortfolioDto } from './dto/create-portfolio.dto';
+import {
+  CreatePortfolioDto,
+  UpdatePortfolioDto,
+} from './dto/create-portfolio.dto';
 
 @Injectable()
 export class PortfolioService {
@@ -56,46 +59,9 @@ export class PortfolioService {
   }
 
   async createPortfolio(dto: CreatePortfolioDto): Promise<PortfolioDto> {
-    const createdPortfolio = await this.prisma.$transaction(async (tx) => {
-      const portfolio = await tx.portfolio.create({
-        data: {
-          name: dto.name,
-          title: dto.title,
-          subtitle: dto.subtitle,
-          description: dto.description,
-          price: dto.price,
-          typeId: dto.typeId,
-          styleId: dto.styleId,
-          layoutId: dto.layoutId,
-          colorId: dto.colorId,
-          bodyColorId: dto.bodyColorId,
-          tableTopColorId: dto.tableTopColorId,
-          sizesRoom: dto.sizesRoom,
-          sizesFurniture: dto.sizesFurniture,
-          housingMaterial: dto.housingMaterial,
-          facadeMaterial: dto.facadeMaterial,
-          tableTopMaterial: dto.tableTopMaterial,
-          furnitureAccessories: dto.furnitureAccessories,
-        },
-      });
-
-      if (dto.facadeColorIds?.length) {
-        await this.createPortfolioColorLinks(
-          tx,
-          portfolio.id,
-          dto.facadeColorIds,
-        );
-      }
-
-      if (dto.imageIds?.length) {
-        await this.createPortfolioImageLinks(tx, portfolio.id, dto.imageIds);
-      }
-
-      return tx.portfolio.findUniqueOrThrow({
-        where: { id: portfolio.id },
-        include: this.buildPortfolioInclude(),
-      });
-    });
+    const createdPortfolio = await this.runWithPortfolioLinksIdRecovery((tx) =>
+      this.createPortfolioInTx(tx, dto),
+    );
 
     return new PortfolioDto(this.normalizePortfolioImageUrls(createdPortfolio));
   }
@@ -106,51 +72,53 @@ export class PortfolioService {
   ): Promise<PortfolioDto> {
     await this.ensurePortfolioExists(id);
 
-    const updatedPortfolio = await this.prisma.$transaction(async (tx) => {
-      await tx.portfolio.update({
-        where: { id },
-        data: {
-          name: dto.name,
-          title: dto.title,
-          subtitle: dto.subtitle,
-          description: dto.description,
-          price: dto.price,
-          typeId: dto.typeId,
-          styleId: dto.styleId,
-          layoutId: dto.layoutId,
-          colorId: dto.colorId,
-          bodyColorId: dto.bodyColorId,
-          tableTopColorId: dto.tableTopColorId,
-          sizesRoom: dto.sizesRoom,
-          sizesFurniture: dto.sizesFurniture,
-          housingMaterial: dto.housingMaterial,
-          facadeMaterial: dto.facadeMaterial,
-          tableTopMaterial: dto.tableTopMaterial,
-          furnitureAccessories: dto.furnitureAccessories,
-        },
-      });
+    const updatedPortfolio = await this.runWithPortfolioLinksIdRecovery(
+      async (tx) => {
+        await tx.portfolio.update({
+          where: { id },
+          data: {
+            name: dto.name,
+            title: dto.title,
+            subtitle: dto.subtitle,
+            description: dto.description,
+            price: dto.price,
+            typeId: dto.typeId,
+            styleId: dto.styleId,
+            layoutId: dto.layoutId,
+            colorId: dto.colorId,
+            bodyColorId: dto.bodyColorId,
+            tableTopColorId: dto.tableTopColorId,
+            sizesRoom: dto.sizesRoom,
+            sizesFurniture: dto.sizesFurniture,
+            housingMaterial: dto.housingMaterial,
+            facadeMaterial: dto.facadeMaterial,
+            tableTopMaterial: dto.tableTopMaterial,
+            furnitureAccessories: dto.furnitureAccessories,
+          },
+        });
 
-      if (dto.facadeColorIds) {
-        await tx.portfolioColorsList.deleteMany({ where: { workId: id } });
+        if (dto.facadeColorIds) {
+          await tx.portfolioColorsList.deleteMany({ where: { workId: id } });
 
-        if (dto.facadeColorIds.length) {
-          await this.createPortfolioColorLinks(tx, id, dto.facadeColorIds);
+          if (dto.facadeColorIds.length) {
+            await this.createPortfolioColorLinks(tx, id, dto.facadeColorIds);
+          }
         }
-      }
 
-      if (dto.imageIds) {
-        await tx.portfolioImagesList.deleteMany({ where: { workId: id } });
+        if (dto.imageIds) {
+          await tx.portfolioImagesList.deleteMany({ where: { workId: id } });
 
-        if (dto.imageIds.length) {
-          await this.createPortfolioImageLinks(tx, id, dto.imageIds);
+          if (dto.imageIds.length) {
+            await this.createPortfolioImageLinks(tx, id, dto.imageIds);
+          }
         }
-      }
 
-      return tx.portfolio.findUniqueOrThrow({
-        where: { id },
-        include: this.buildPortfolioInclude(),
-      });
-    });
+        return tx.portfolio.findUniqueOrThrow({
+          where: { id },
+          include: this.buildPortfolioInclude(),
+        });
+      },
+    );
 
     return new PortfolioDto(this.normalizePortfolioImageUrls(updatedPortfolio));
   }
@@ -323,16 +291,12 @@ export class PortfolioService {
     workId: number,
     colorIds: number[],
   ): Promise<void> {
-    await this.createManyWithIdRetry(
-      () =>
-        tx.portfolioColorsList.createMany({
-          data: colorIds.map((colorId) => ({
-            workId,
-            colorId,
-          })),
-        }),
-      () => this.resyncPortfolioColorsListIdSequence(tx),
-    );
+    await tx.portfolioColorsList.createMany({
+      data: colorIds.map((colorId) => ({
+        workId,
+        colorId,
+      })),
+    });
   }
 
   private async createPortfolioImageLinks(
@@ -340,40 +304,44 @@ export class PortfolioService {
     workId: number,
     imageIds: number[],
   ): Promise<void> {
-    await this.createManyWithIdRetry(
-      () =>
-        tx.portfolioImagesList.createMany({
-          data: imageIds.map((imageId) => ({
-            workId,
-            imageId,
-          })),
-        }),
-      () => this.resyncPortfolioImagesListIdSequence(tx),
-    );
+    await tx.portfolioImagesList.createMany({
+      data: imageIds.map((imageId) => ({
+        workId,
+        imageId,
+      })),
+    });
   }
 
-  private async createManyWithIdRetry(
-    action: () => Promise<Prisma.BatchPayload>,
-    resyncIdSequence: () => Promise<void>,
-  ): Promise<void> {
+  private async runWithPortfolioLinksIdRecovery<T>(
+    action: (tx: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
     try {
-      await action();
+      return await this.prisma.$transaction((tx) => action(tx));
     } catch (error) {
-      if (!this.isDuplicateIdError(error)) {
+      if (!this.isPortfolioLinksDuplicateIdError(error)) {
         throw error;
       }
 
-      await resyncIdSequence();
-      await action();
+      await this.resyncPortfolioColorsListIdSequence();
+      await this.resyncPortfolioImagesListIdSequence();
+      return this.prisma.$transaction((tx) => action(tx));
     }
   }
 
-  private isDuplicateIdError(error: unknown): boolean {
+  private isPortfolioLinksDuplicateIdError(error: unknown): boolean {
     if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
       return false;
     }
 
     if (error.code !== 'P2002') {
+      return false;
+    }
+
+    const modelName = String(error.meta?.modelName ?? '');
+    const isPortfolioLinksModel =
+      modelName === 'PortfolioImagesList' || modelName === 'PortfolioColorsList';
+
+    if (!isPortfolioLinksModel) {
       return false;
     }
 
@@ -386,10 +354,8 @@ export class PortfolioService {
     return typeof target === 'string' && target.includes('id');
   }
 
-  private async resyncPortfolioColorsListIdSequence(
-    tx: Prisma.TransactionClient,
-  ): Promise<void> {
-    await tx.$executeRaw`
+  private async resyncPortfolioColorsListIdSequence(): Promise<void> {
+    await this.prisma.$executeRaw`
       SELECT setval(
         pg_get_serial_sequence('"portfolio_colors_list"', 'id'),
         COALESCE((SELECT MAX(id) FROM "portfolio_colors_list"), 0) + 1,
@@ -398,15 +364,57 @@ export class PortfolioService {
     `;
   }
 
-  private async resyncPortfolioImagesListIdSequence(
-    tx: Prisma.TransactionClient,
-  ): Promise<void> {
-    await tx.$executeRaw`
+  private async resyncPortfolioImagesListIdSequence(): Promise<void> {
+    await this.prisma.$executeRaw`
       SELECT setval(
         pg_get_serial_sequence('"portfolio_images_list"', 'id'),
         COALESCE((SELECT MAX(id) FROM "portfolio_images_list"), 0) + 1,
         false
       );
     `;
+  }
+
+  private async createPortfolioInTx(
+    tx: Prisma.TransactionClient,
+    dto: CreatePortfolioDto,
+  ) {
+    const portfolio = await tx.portfolio.create({
+      data: {
+        name: dto.name,
+        title: dto.title,
+        subtitle: dto.subtitle,
+        description: dto.description,
+        price: dto.price,
+        typeId: dto.typeId,
+        styleId: dto.styleId,
+        layoutId: dto.layoutId,
+        colorId: dto.colorId,
+        bodyColorId: dto.bodyColorId,
+        tableTopColorId: dto.tableTopColorId,
+        sizesRoom: dto.sizesRoom,
+        sizesFurniture: dto.sizesFurniture,
+        housingMaterial: dto.housingMaterial,
+        facadeMaterial: dto.facadeMaterial,
+        tableTopMaterial: dto.tableTopMaterial,
+        furnitureAccessories: dto.furnitureAccessories,
+      },
+    });
+
+    if (dto.facadeColorIds?.length) {
+      await this.createPortfolioColorLinks(
+        tx,
+        portfolio.id,
+        dto.facadeColorIds,
+      );
+    }
+
+    if (dto.imageIds?.length) {
+      await this.createPortfolioImageLinks(tx, portfolio.id, dto.imageIds);
+    }
+
+    return tx.portfolio.findUniqueOrThrow({
+      where: { id: portfolio.id },
+      include: this.buildPortfolioInclude(),
+    });
   }
 }
