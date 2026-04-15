@@ -53,7 +53,9 @@ export class QuestionsController {
   @ApiResponse({ status: HttpStatus.OK, type: [QuestionEntity] })
   @AdminAccess()
   @Get('')
-  async getAllQuestions(): Promise<(Question & { category: Category | null })[]> {
+  async getAllQuestions(): Promise<
+    (Question & { category: Category | null })[]
+  > {
     return this.questionsService.getAllQuestions();
   }
 
@@ -80,7 +82,10 @@ export class QuestionsController {
 
   @ApiOperation({ summary: 'Удалить категорию' })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, schema: { example: { success: true } } })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: { example: { success: true } },
+  })
   @AdminAccess()
   @Delete('categories/:id')
   async deleteCategory(
@@ -115,7 +120,10 @@ export class QuestionsController {
 
   @ApiOperation({ summary: 'Удалить вопрос' })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, schema: { example: { success: true } } })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: { example: { success: true } },
+  })
   @AdminAccess()
   @Delete(':id')
   async deleteQuestion(
