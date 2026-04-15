@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/crud/database';
 import { Prisma } from '@prisma/client';
 import { PortfolioDto, PortfolioWithRelations } from './dto/PortfolioDto';
@@ -59,6 +59,8 @@ export class PortfolioService {
   }
 
   async createPortfolio(dto: CreatePortfolioDto): Promise<PortfolioDto> {
+    await this.validatePortfolioLinkIds(dto.facadeColorIds, dto.imageIds);
+
     const createdPortfolio = await this.runWithPortfolioLinksIdRecovery((tx) =>
       this.createPortfolioInTx(tx, dto),
     );
@@ -71,6 +73,7 @@ export class PortfolioService {
     dto: UpdatePortfolioDto,
   ): Promise<PortfolioDto> {
     await this.ensurePortfolioExists(id);
+    await this.validatePortfolioLinkIds(dto.facadeColorIds, dto.imageIds);
 
     const updatedPortfolio = await this.runWithPortfolioLinksIdRecovery(
       async (tx) => {
@@ -339,7 +342,8 @@ export class PortfolioService {
 
     const modelName = String(error.meta?.modelName ?? '');
     const isPortfolioLinksModel =
-      modelName === 'PortfolioImagesList' || modelName === 'PortfolioColorsList';
+      modelName === 'PortfolioImagesList' ||
+      modelName === 'PortfolioColorsList';
 
     if (!isPortfolioLinksModel) {
       return false;
@@ -416,5 +420,67 @@ export class PortfolioService {
       where: { id: portfolio.id },
       include: this.buildPortfolioInclude(),
     });
+  }
+
+  private async validatePortfolioLinkIds(
+    facadeColorIds?: number[],
+    imageIds?: number[],
+  ): Promise<void> {
+    await Promise.all([
+      this.validateFacadeColorIds(facadeColorIds),
+      this.validateImageIds(imageIds),
+    ]);
+  }
+
+  private async validateFacadeColorIds(
+    facadeColorIds?: number[],
+  ): Promise<void> {
+    if (!facadeColorIds) {
+      return;
+    }
+
+    const uniqueIds = [...new Set(facadeColorIds)];
+
+    if (uniqueIds.length === 0) {
+      return;
+    }
+
+    const existingColors = await this.prisma.color.findMany({
+      where: { id: { in: uniqueIds } },
+      select: { id: true },
+    });
+    const existingColorIds = new Set(existingColors.map((color) => color.id));
+    const missingColorIds = uniqueIds.filter((id) => !existingColorIds.has(id));
+
+    if (missingColorIds.length > 0) {
+      throw new BadRequestException(
+        `Некоторые facadeColorIds не существуют: ${missingColorIds.join(', ')}`,
+      );
+    }
+  }
+
+  private async validateImageIds(imageIds?: number[]): Promise<void> {
+    if (!imageIds) {
+      return;
+    }
+
+    const uniqueIds = [...new Set(imageIds)];
+
+    if (uniqueIds.length === 0) {
+      return;
+    }
+
+    const existingImages = await this.prisma.image.findMany({
+      where: { id: { in: uniqueIds } },
+      select: { id: true },
+    });
+    const existingImageIds = new Set(existingImages.map((image) => image.id));
+    const missingImageIds = uniqueIds.filter((id) => !existingImageIds.has(id));
+
+    if (missingImageIds.length > 0) {
+      throw new BadRequestException(
+        `Некоторые imageIds не существуют: ${missingImageIds.join(', ')}`,
+      );
+    }
   }
 }
