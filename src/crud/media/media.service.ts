@@ -71,25 +71,12 @@ export class MediaService {
     this.validateUpload(file);
     this.ensureS3Configured();
 
-    console.log('Пришел файл, загружается');
-    console.log(file);
-
     const folder = this.normalizeFolder(
       uploadDto.folder ?? this.mediaRootFolder,
     );
     const key = this.buildObjectKey(folder, file.originalname);
 
     try {
-      console.log('Отправка файла в s3');
-      console.log('То что отправляется:');
-      console.log(
-        new PutObjectCommand({
-          Bucket: this.bucket,
-          Key: key,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }),
-      );
       await this.s3Client.send(
         new PutObjectCommand({
           Bucket: this.bucket,
@@ -104,7 +91,6 @@ export class MediaService {
       );
     }
 
-    console.log('файл загрузился, загружается в бд');
     const imageCreateData: Prisma.ImageCreateInput = {
       src: this.buildPublicUrl(key),
       s3Key: key,

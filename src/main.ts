@@ -18,6 +18,12 @@ async function bootstrap() {
   // Config
   const config = app.get(ConfigService);
   const API_URL = config.getOrThrow<string>('API_URL');
+  const allowedOrigins = config
+    .getOrThrow<string>('CORS_ORIGIN')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const allowAnyOrigin = allowedOrigins.includes('*');
 
   const swagger = new DocumentBuilder()
     .setTitle('TehComf API server')
@@ -46,7 +52,19 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: config.getOrThrow<string>('CORS_ORIGIN').split(','),
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowAnyOrigin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} is not allowed by CORS`), false);
+    },
     methods: ['POST', 'PUT', 'PATCH', 'DELETE', 'GET', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
