@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 
 export class ClaimDto {
   @ApiProperty()
@@ -20,4 +20,9 @@ export class ClaimDto {
   @IsString()
   @IsNotEmpty()
   claimType: string;
+  @ApiProperty({ required: false, example: 'ООО Ремонтное бюро' })
+  @ValidateIf((claim: ClaimDto) => claim.claimType === 'Ремонтное бюро')
+  @IsString()
+  @IsNotEmpty()
+  company?: string;
 }

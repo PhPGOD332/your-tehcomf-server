@@ -7,6 +7,9 @@ export class ClaimsService {
   constructor(private readonly mailService: MailService) {}
 
   async addClaim(claim: ClaimDto): Promise<ClaimDto> {
-    return await this.mailService.sendMail(claim);
+    return await this.mailService.sendMail({
+      ...claim,
+      company: claim.claimType === 'Ремонтное бюро' ? claim.company : undefined,
+    });
   }
 }
