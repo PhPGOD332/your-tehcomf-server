@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ClaimsService } from './claims.service';
 import { ClaimDto } from './dto/Claim.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -6,6 +13,7 @@ import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('Claims')
 @Controller('claims')
+@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 export class ClaimsController {
   constructor(private readonly claimsService: ClaimsService) {}
 
@@ -23,9 +31,6 @@ export class ClaimsController {
   @Public()
   @Post('addClaim')
   async addClaim(@Body() claimDto: ClaimDto): Promise<ClaimDto> {
-    return await this.claimsService.addClaim({
-      ...claimDto,
-      date: new Date(claimDto.date),
-    });
+    return await this.claimsService.addClaim(claimDto);
   }
 }

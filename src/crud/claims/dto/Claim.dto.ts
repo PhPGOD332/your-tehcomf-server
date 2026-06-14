@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class ClaimDto {
   @ApiProperty()
@@ -12,21 +13,11 @@ export class ClaimDto {
   @IsString()
   note: string;
   @ApiProperty()
+  @Type(() => Date)
   @IsDate()
   date: Date;
-  @ApiProperty()
-  @IsBoolean()
-  callDesign: boolean;
-  @ApiProperty()
-  @IsBoolean()
-  discussProject: boolean;
-
-  constructor(data: ClaimDto) {
-    this.firstName = data.firstName;
-    this.mobilePhone = data.mobilePhone;
-    this.note = data.note;
-    this.date = data.date;
-    this.callDesign = data.callDesign;
-    this.discussProject = data.discussProject;
-  }
+  @ApiProperty({ example: 'Обсудить проект' })
+  @IsString()
+  @IsNotEmpty()
+  claimType: string;
 }

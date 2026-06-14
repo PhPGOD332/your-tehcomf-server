@@ -11,18 +11,6 @@ export class MailService {
   ) {}
 
   async sendMail(claim: ClaimDto) {
-    let claimTypeRow = '';
-
-    if (claim.callDesign && claim.discussProject) {
-      claimTypeRow = 'Вызвать дизайнера и обсудить проект';
-    } else if (claim.callDesign && !claim.discussProject) {
-      claimTypeRow = 'Вызвать дизайнера';
-    } else if (!claim.callDesign && claim.discussProject) {
-      claimTypeRow = 'Обсудить проект';
-    } else {
-      claimTypeRow = '-';
-    }
-
     try {
       await this.mailService.sendMail({
         from: `${this.configService.get('SMTP_USER')}`,
@@ -34,7 +22,7 @@ export class MailService {
               ${claim.firstName ? `<p><b>Имя</b>: ${claim.firstName}</p>` : ''}
               ${claim.mobilePhone ? `<p><b>Телефон</b>: ${claim.mobilePhone}</p>` : ''}
               ${claim.note ? `<p><b>Пожелания</b>: ${claim.note}</p>` : ''}
-              <p><b>Тип заявки:</b> ${claimTypeRow}</p>
+              <p><b>Тип заявки:</b> ${claim.claimType}</p>
               <p><b>Дата:</b> ${claim.date.getDate().toString().padStart(2, '0')}.${(claim.date.getMonth() + 1).toString().padStart(2, '0')}.${claim.date.getFullYear()}</p>
           </div>
       `,
