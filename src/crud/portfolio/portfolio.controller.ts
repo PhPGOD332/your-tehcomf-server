@@ -68,6 +68,16 @@ export class PortfolioController {
     return await this.portfolioService.getAllPortfolios(filters);
   }
 
+  @Public()
+  @Get('last')
+  async getLastWorks(
+    @Query('filter-name') filterName?: TFilterType | TFilterType[],
+    @Query('filter-value') filterValue?: string | string[],
+  ): Promise<PortfolioDto[]> {
+    const filters = this.normalizeFilters(filterName, filterValue);
+    return await this.portfolioService.getLastWorks(filters);
+  }
+
   @ApiOperation({
     summary: 'Получить конкретную работу',
   })

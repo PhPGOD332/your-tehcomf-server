@@ -36,6 +36,25 @@ export class PortfolioService {
     );
   }
 
+  async getLastWorks(
+    filters?: { name: TFilterType; value: string }[],
+  ): Promise<PortfolioDto[]> {
+    const where = await this.buildFilters(filters);
+
+    const portfolios = await this.prisma.portfolio.findMany({
+      where,
+      include: this.buildPortfolioInclude(),
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    return portfolios.map(
+      (portfolio) =>
+        new PortfolioDto(this.normalizePortfolioImageUrls(portfolio)),
+    );
+  }
+
   async getPortfolioItem(name: string): Promise<PortfolioDto | null> {
     const portfolio = await this.prisma.portfolio.findFirst({
       where: { name },
