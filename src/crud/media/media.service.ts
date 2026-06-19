@@ -74,7 +74,10 @@ export class MediaService {
     const folder = this.normalizeFolder(
       uploadDto.folder ?? this.mediaRootFolder,
     );
-    const key = this.buildObjectKey(folder, file.originalname);
+    const originalName =
+      this.normalizeMultipartText(file.originalname) ?? file.originalname;
+    const imageAlt = this.normalizeMultipartText(uploadDto.imageAlt);
+    const key = this.buildObjectKey(folder, originalName);
 
     try {
       await this.s3Client.send(
@@ -94,7 +97,7 @@ export class MediaService {
     const imageCreateData: Prisma.ImageCreateInput = {
       src: this.buildPublicUrl(key),
       s3Key: key,
-      imageAlt: uploadDto.imageAlt?.trim() || file.originalname,
+      imageAlt: imageAlt || originalName,
       order: uploadDto.order,
       width: uploadDto.width,
       height: uploadDto.height,
@@ -301,6 +304,32 @@ export class MediaService {
 
   private normalizeFolder(folder: string): string {
     return folder.replace(/^\/+/, '').replace(/\/+$/, '');
+  }
+
+  private normalizeMultipartText(value?: string): string | undefined {
+    const normalizedValue = value?.trim();
+
+    if (!normalizedValue) {
+      return normalizedValue;
+    }
+
+    if (!this.isLikelyMojibake(normalizedValue)) {
+      return normalizedValue.normalize('NFC');
+    }
+
+    const decodedValue = Buffer.from(normalizedValue, 'latin1').toString(
+      'utf8',
+    );
+
+    if (decodedValue.includes('�')) {
+      return normalizedValue.normalize('NFC');
+    }
+
+    return decodedValue.normalize('NFC');
+  }
+
+  private isLikelyMojibake(value: string): boolean {
+    return /[ÃÂÐÑ]/.test(value);
   }
 
   private validateUpload(file: Express.Multer.File): void {
