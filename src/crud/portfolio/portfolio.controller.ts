@@ -54,6 +54,19 @@ export class PortfolioController {
     description:
       'Значение фильтра (название или бюджет). При budget можно передать id или название.',
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description:
+      'Количество работ для пагинации. Если передано, ответ будет объектом { items, total }.',
+  })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    type: Number,
+    description: 'Смещение для пагинации. Используется вместе с limit.',
+  })
   @ApiResponse({
     status: 200,
     type: [PortfolioDto],
@@ -63,8 +76,19 @@ export class PortfolioController {
   async getAllPortfolio(
     @Query('filter-name') filterName?: TFilterType | TFilterType[],
     @Query('filter-value') filterValue?: string | string[],
-  ): Promise<PortfolioDto[]> {
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ): Promise<PortfolioDto[] | { items: PortfolioDto[]; total: number }> {
     const filters = this.normalizeFilters(filterName, filterValue);
+
+    if (limit !== undefined) {
+      const pagination = this.normalizePagination(limit, offset);
+      return await this.portfolioService.getPortfoliosPage(
+        filters,
+        pagination,
+      );
+    }
+
     return await this.portfolioService.getAllPortfolios(filters);
   }
 
@@ -168,5 +192,18 @@ export class PortfolioController {
     }
 
     return pairs;
+  }
+
+  private normalizePagination(
+    limitRaw: string,
+    offsetRaw?: string,
+  ): { offset: number; limit: number } {
+    const limit = Number(limitRaw);
+    const offset = Number(offsetRaw ?? 0);
+
+    return {
+      limit: Number.isInteger(limit) && limit > 0 ? Math.min(limit, 50) : 12,
+      offset: Number.isInteger(offset) && offset >= 0 ? offset : 0,
+    };
   }
 }

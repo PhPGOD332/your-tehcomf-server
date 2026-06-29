@@ -17,6 +17,33 @@ import {
 export class PortfolioService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getPortfoliosPage(
+    filters: { name: TFilterType; value: string }[] | undefined,
+    pagination: { offset: number; limit: number },
+  ): Promise<{ items: PortfolioDto[]; total: number }> {
+    const where = await this.buildFilters(filters);
+    const [total, portfolios] = await this.prisma.$transaction([
+      this.prisma.portfolio.count({ where }),
+      this.prisma.portfolio.findMany({
+        where,
+        include: this.buildPortfolioInclude(),
+        orderBy: {
+          id: 'asc',
+        },
+        skip: pagination.offset,
+        take: pagination.limit,
+      }),
+    ]);
+
+    return {
+      total,
+      items: portfolios.map(
+        (portfolio) =>
+          new PortfolioDto(this.normalizePortfolioImageUrls(portfolio)),
+      ),
+    };
+  }
+
   async getAllPortfolios(
     filters?: { name: TFilterType; value: string }[],
   ): Promise<PortfolioDto[]> {
